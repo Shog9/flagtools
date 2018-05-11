@@ -10,7 +10,7 @@ Adds a sortable, filterable list of flags to the moderator dashboard
 
 Install: [MonicasFlagToC.user.js](../../raw/master/MonicasFlagToC.user.js)
 
-Flag Filter is a Stack Exchange moderator userscript designed to simplify the moderation process (particularly in the case of high-volume flag sites) by moving flags to sit inline on the posts and comments they relate to on the page rather than being restricted to the bottom-locked flag overlay (The "Waffle Bar").
+Flag ToC is a Stack Exchange moderator userscript designed to simplify the moderation process (particularly in the case of high-volume flag sites) by moving flags to sit inline on the posts and comments they relate to on the page rather than being restricted to the bottom-locked flag overlay (The "Waffle Bar").
 
 ## Table-of-Contents
 
@@ -37,7 +37,7 @@ This userscript is also compatable with Firefox for Android if using a script ma
 
 ### Compatable Moderator Userscripts
 
-This is a brief list of Moderator Userscripts that are known to be usable (or not) in conjunction with Flag Filter on the question page. Userscript links below are to RAW install files.
+This is a brief list of Moderator Userscripts that are known to be usable (or not) in conjunction with Flag ToC on the question page. Userscript links below are to RAW install files.
 
 #### Compatable:
 - [animuson](https://github.com/animuson)'s [Stack Exchange Moderator Tools Improved (SEMTI)](https://github.com/animuson/se-mod-tools-improved/raw/master/better-mod-tools.user.js).
@@ -45,16 +45,16 @@ This is a brief list of Moderator Userscripts that are known to be usable (or no
 
 
 #### Incompatable:
-- ArtOfCode's [Show Comment Flagger](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/comment_flagger.user.js) userscript is not compatable with Flag Filter, so having it will not reveal who flagged comments on the question page while Flag Filter is active. Flagger usernames can still be viewed on the flags dashboard or by temporarily disabling Flag Filter. Both userscripts can be active simultaneously without causing any errors.
+- ArtOfCode's [Show Comment Flagger](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/comment_flagger.user.js) userscript is not compatable with Flag ToC, so having it will not reveal who flagged comments on the question page while Flag ToC is active. Flagger usernames can still be viewed on the flags dashboard or by temporarily disabling Flag ToC. Both userscripts can be active simultaneously without causing any errors.
 
 <a id="overview"></a> 
 ## Overview
 
-Flag Filter works by moving the flag content from the vertically-scrolling Waffle Bar directly onto the page with the Waffle Bar becoming a table-of-contents listing all posts (identified by post type and username) with active flags and type of flag. While the native Waffle Bar is useful on questions with few flags, the more flags that exist on a Q&A thread, the more real estate the bar takes up, and the more searching the moderator has to do to match up the flag with the flagged post or comment and see it in context. 
+Flag ToC works by moving the flag content from the vertically-scrolling Waffle Bar directly onto the page with the Waffle Bar becoming a table-of-contents listing all posts (identified by post type and username) with active flags and type of flag. While the native Waffle Bar is useful on questions with few flags, the more flags that exist on a Q&A thread, the more real estate the bar takes up, and the more searching the moderator has to do to match up the flag with the flagged post or comment and see it in context. 
 
 When it comes to comments, the content is duplicated, as the comment text appears both on the page and in the Waffle Bar. On sites with huge volumes of comment flags, this makes for a lot of scrolling inside the Waffle Bar to review the flags and it's still often necessary (or at least helpful) to see them in context with the rest of the (unflagged) comments.
 
-Compare, these two images are the native view and Flag Filter view of the same post with many flags:
+Compare, these two images are the native view and Flag ToC view of the same post with many flags:
 
 The native view of a question with lots of flags:
 
@@ -67,9 +67,9 @@ This is a huge mess.
 - The comments are still collapsed, so the first comment on the question that's flagged is invisble and lacking context.
 - Minimizing the bar to see more of the page hides *all* of the flag information, making it impossible to know which posts and comments have been flagged. When the bar is expanded, in order to get context, each post or comment link goes directly to the flagged post or comment.
 
-The same question with the Flag Filter userscript active, same volume of flags:
+The same question with the Flag ToC userscript active, same volume of flags:
 
-[![Flag filter view][11]][11]
+[![Flag ToC view][11]][11]
 
 - The table-of-contents is a fraction of the size and shows *all* of the 30 flags and flag reasons on five posts simultaneously, starting with the question.
 - The question is clearly marked as having been flagged and why. The shaded area with the colorful sidebar draws attention. Each post and comments section lists the number of active and resolved flags.
@@ -102,7 +102,7 @@ Inline flagging allows moderators to see the flags directly in context of the po
 
 Both active and resolved flags appear expanded on posts when there is at least one active flag on the post.
 
-[![flag filter banner with both active and resolved post flags][2]][2]
+[![flag banner with both active and resolved post flags][2]][2]
 
 Active flags are in dark text; resolved flags are greyed out.
 
@@ -111,12 +111,12 @@ If the post only has one active flag (or if the same resolution can be used for 
 - "Helpful..." results in an optional feedback text field and a button that reads "mark helpful".  
 [!["Helpful..." flagging menu][4]][4]
 
-- "Decline..." results in the four standard decline reason options in click boxes or the option of entering custom text. Flag Filter will save the last-used custom decline reason and add it to the list of options until replaced by another custom reason (in this case, "This is a dumb autoflag. Shoo.)"  
+- "Decline..." results in the four standard decline reason options in click boxes or the option of entering custom text. Flag ToC will save the last-used custom decline reason and add it to the list of options until replaced by another custom reason (in this case, "This is a dumb autoflag. Shoo.)"  
 [!["Decline..." flag menu.][5]][5]
 
 If the post has multiple active flags and they should not be handled in the same way or they need different feedback, hovering over the active flags will reveal a small x bearing the hover text "dismiss this flag as helpful or declined". Clicking on the x for the a flag opens a sub-option of "Helpful..." and "Decline..." that will handle that flag only. Clicking on these reveals the same options as above.
 
-[![flag filter banner showing Sub-options for handling one flag at a time][3]][3]
+[![flag banner showing Sub-options for handling one flag at a time][3]][3]
 
 <a id="comment-active"></a> 
 ### Comment flags
