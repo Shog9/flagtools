@@ -884,3 +884,5 @@ function initFlagFilter()
 }
    
 });
+
+});
