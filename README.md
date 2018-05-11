@@ -2,13 +2,13 @@ A small collection of tools for handling flags
 
 # Flag Filter
 
-Install: [FlagFilter.user.js](./raw/master/FlagFilter.user.js)
+Install: [FlagFilter.user.js](../../raw/master/FlagFilter.user.js)
 
 Adds a sortable, filterable list of flags to the moderator dashboard
 
 # Flag ToC - Monica's Table-of-Contents prototype
 
-Install: [MonicasFlagToC.user.js](./raw/master/MonicasFlagToC.user.js)
+Install: [MonicasFlagToC.user.js](../../raw/master/MonicasFlagToC.user.js)
 
 Flag Filter is a Stack Exchange moderator userscript designed to simplify the moderation process (particularly in the case of high-volume flag sites) by moving flags to sit inline on the posts and comments they relate to on the page rather than being restricted to the bottom-locked flag overlay (The "Waffle Bar").
 
@@ -31,7 +31,7 @@ Flag Filter is a Stack Exchange moderator userscript designed to simplify the mo
 
 This script will only work for diamond moderators or staff of the Stack Exchange Network on those sites where they have diamonds. The information below is based on the moderator view. Some details may vary in a minor way for staff users.
 
-To use, have a current version of Chrome or Firefox with a current version of a userscript manager - generally [Tampermonkey](https://tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/get-it/). Install the script by viewing the [raw file](./raw/master/MonicasFlagToC.user.js) on the GitHub Project page. 
+To use, have a current version of Chrome or Firefox with a current version of a userscript manager - generally [Tampermonkey](https://tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/get-it/). Install the script by viewing the [raw file](../../raw/master/MonicasFlagToC.user.js) on the GitHub Project page. 
 
 This userscript is also compatable with Firefox for Android if using a script manager and the full site page view.
 
