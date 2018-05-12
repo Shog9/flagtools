@@ -6,6 +6,28 @@ Install: [FlagFilter.user.js](../../raw/master/FlagFilter.user.js)
 
 Adds a sortable, filterable list of flags to the moderator dashboard
 
+![screenshot](https://i.stack.imgur.com/bzUOj.png)
+
+## Filter expression syntax
+
+Filter can be a regular expression to match on the text of the flag, and/or a combination of the following operators:
+
+- `:isquestion()` - limit results to questions
+- `:isanswer()` - limit results to answers
+- `:isdeleted()` - limit results to deleted posts
+- `:isclosed()` - limit results to closed posts
+- `:isanswered()` - limit results to questions with accepted answers
+- `:isaccepted()` - limit results to accepted answers
+- `:user(userId)` - limit results to posts owned by the user identified by `userId`
+- `:tag(tagName)` - limit results to posts tagged with `tagName`
+- `:flagger(userId)` - limit results to posts flagged by a user identified by `userId`
+- `:type(flagType)` - limit results to posts with a flag of `flagType`
+- `:selfflagged()` - limit results to posts with a flag raised by the author
+- `:not(filterExpression)` - limit results to posts that do not match `filterExpression`
+
+Operators always combine; results must match ALL operators *and* any expressions in filter. See examples in the "Low-hanging fruit" sidebar.
+
+
 # Flag ToC - Monica's Table-of-Contents prototype
 
 Install: [MonicasFlagToC.user.js](../../raw/master/MonicasFlagToC.user.js)
