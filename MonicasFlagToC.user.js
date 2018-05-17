@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.897
+// @version       0.898
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -409,12 +409,13 @@ function initTools()
                   <label class="f-label">Reason flag was helpful</label>
                   <div class="g-col g-row _gutters">
                      <div class="g-col -input">
-                         <input type="text" placeholder="optional feedback (visible to the user)" class="f-input">
+                         <input type="text" maxlength="200" placeholder="optional feedback (visible to the user)" class="f-input">
                      </div>
                      <div class="g-col -btn">
                        <button class="btn-outlined mark-flag-helpful" type="submit">mark helpful</button>
                      </div>
                   </div>
+                  <span class="text-counter cool">enter nothing at all, or up to 200 characters of cheerful guidance</span>
                 </form>
             </div>
          `);
@@ -424,6 +425,8 @@ function initTools()
             .appendTo(uiParent)
             .slideDown()
             .find("button,input").first().focus();
+            
+         helpfulForm.find("input[type=text]").charCounter({min: 0, max: 200, target: helpfulForm.find(".text-counter")});
 
          helpfulForm.find(".mark-flag-helpful").click(function(ev)
          {
@@ -444,12 +447,13 @@ function initTools()
                   <label class="f-label">Reason for declining</label>
                   <div class="g-col g-row _gutters">
                      <div class="g-col -input">
-                         <input type="text" placeholder="optional feedback (visible to the user)" class="f-input">
+                         <input type="text" maxlength="200" placeholder="optional feedback (visible to the user)" class="f-input">
                      </div>
                      <div class="g-col -btn">
                        <button class="btn-outlined mark-flag-declined" value="other" type="submit" disabled>decline</button>
                      </div>
                   </div>
+                  <span class="text-counter cool">enter at least 10 characters of righteous indignation</span>         
                </form>
             </div>
          `);
@@ -505,8 +509,9 @@ function initTools()
             .on("input", function()
             {
                var text = customDeclineField.val();
-               declineForm.find(".mark-flag-declined[value=other]").prop("disabled", text.length === 0);
-            });
+               declineForm.find(".mark-flag-declined[value=other]").prop("disabled", text.length < 10);
+            })
+            .charCounter({min: 10, max: 200, target: declineForm.find(".text-counter")})         
 
          declineForm.find(".mark-flag-declined").click(function(ev)
          {
