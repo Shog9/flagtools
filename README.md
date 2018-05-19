@@ -1,4 +1,15 @@
-A small collection of tools for handling flags
+A small collection of tools for handling flags.
+
+## Installation
+
+To use these scripts, have a current version of Chrome or Firefox (other browsers are untested but may work) with a current version of a userscript manager - generally [Tampermonkey](https://tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/get-it/). Install the script by viewing the raw file linked below for the userscript on the GitHub Project page. 
+
+- [FlagFilter.user.js](../../raw/master/FlagFilter.user.js)
+- [MonicasFlagToC.user.js](../../raw/master/MonicasFlagToC.user.js)
+
+These userscripts are also compatible with Firefox for Android if using a script manager and the full site page view.
+
+---
 
 # Flag Filter
 
@@ -27,6 +38,7 @@ Filter can be a regular expression to match on the text of the flag, and/or a co
 
 Operators always combine; results must match ALL operators *and* any expressions in filter. See examples in the "Low-hanging fruit" sidebar.
 
+---
 
 # Flag ToC - Monica's Table-of-Contents prototype
 
@@ -38,7 +50,7 @@ Flag ToC is a Stack Exchange moderator userscript designed to simplify the moder
 
 - [Getting Started](#getting-started)
 - [Overview](#overview)
-  - [Compatable Moderator Userscripts](#compatable-scripts) 
+  - [Compatible Moderator Userscripts](#compatible-scripts) 
 - [The new Waffle Bar](#new-waffle)
 - [Inline flagging - Active flags](#active-flags)
   - [Post flags](#post-active)
@@ -53,30 +65,26 @@ Flag ToC is a Stack Exchange moderator userscript designed to simplify the moder
 
 This script will only work for diamond moderators or staff of the Stack Exchange Network on those sites where they have diamonds. The information below is based on the moderator view. Some details may vary in a minor way for staff users.
 
-To use, have a current version of Chrome or Firefox with a current version of a userscript manager - generally [Tampermonkey](https://tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/get-it/). Install the script by viewing the [raw file](../../raw/master/MonicasFlagToC.user.js) on the GitHub Project page. 
-
-This userscript is also compatable with Firefox for Android if using a script manager and the full site page view.
-
-### Compatable Moderator Userscripts
+### Compatible Moderator Userscripts
 
 This is a brief list of Moderator Userscripts that are known to be usable (or not) in conjunction with Flag ToC on the question page. Userscript links below are to RAW install files.
 
-#### Compatable:
+#### Compatible:
 - [animuson](https://github.com/animuson)'s [Stack Exchange Moderator Tools Improved (SEMTI)](https://github.com/animuson/se-mod-tools-improved/raw/master/better-mod-tools.user.js).
 - [ArtOfCode](https://github.com/ArtOfCode-)'s [Move SE Mod Info](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/move_mod_info.user.js)
 
 
-#### Incompatable:
-- ArtOfCode's [Show Comment Flagger](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/comment_flagger.user.js) userscript is not compatable with Flag ToC, so having it will not reveal who flagged comments on the question page while Flag ToC is active. Flagger usernames can still be viewed on the flags dashboard or by temporarily disabling Flag ToC. Both userscripts can be active simultaneously without causing any errors.
+#### Incompatible:
+- ArtOfCode's [Show Comment Flagger](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/comment_flagger.user.js) userscript is not compatible with Flag ToC, so having it will not reveal who flagged comments on the question page while Flag ToC is active. Flagger usernames can still be viewed on the flags dashboard or by temporarily disabling Flag ToC. Both userscripts can be active simultaneously without causing any errors.
 
 <a id="overview"></a> 
 ## Overview
 
-Flag ToC works by moving the flag content from the vertically-scrolling Waffle Bar directly onto the page with the Waffle Bar becoming a table-of-contents listing all posts (identified by post type and username) with active flags and type of flag. While the native Waffle Bar is useful on questions with few flags, the more flags that exist on a Q&A thread, the more real estate the bar takes up, and the more searching the moderator has to do to match up the flag with the flagged post or comment and see it in context. 
+Flag ToC works by moving the flag content from the vertically-scrolling Waffle Bar directly onto the page with the Waffle Bar becoming a table-of-contents listing all posts (identified by post type and username) with active flags and type of flag. While the native Waffle Bar is useful on questions with few flags, the more flags that exist on a Q&A thread, the more real estate the bar takes up, and the more searching a moderator has to do to match up the flag with the flagged post or comment and see it in context. 
 
 When it comes to comments, the content is duplicated, as the comment text appears both on the page and in the Waffle Bar. On sites with huge volumes of comment flags, this makes for a lot of scrolling inside the Waffle Bar to review the flags and it's still often necessary (or at least helpful) to see them in context with the rest of the (unflagged) comments.
 
-Compare, these two images are the native view and Flag ToC view of the same post with many flags:
+Compare: the two images below are the native view and Flag ToC view of the same post with many flags:
 
 The native view of a question with lots of flags:
 
@@ -86,31 +94,31 @@ This is a huge mess.
 
 - Over half the page (on this small monitor) is taken up by the Waffle Bar, so little of the actual post is viewable.
 - There's no indication of how many flags there are on how many posts, only the really long scroll bar indicating that there are many.
-- The comments are still collapsed, so the first comment on the question that's flagged is invisble and lacking context.
+- The comments are still collapsed, so the first comment on the question that's flagged is invisible and lacking context.
 - Minimizing the bar to see more of the page hides *all* of the flag information, making it impossible to know which posts and comments have been flagged. When the bar is expanded, in order to get context, each post or comment link goes directly to the flagged post or comment.
 
 The same question with the Flag ToC userscript active, same volume of flags:
 
 [![Flag ToC view][11]][11]
 
-- The table-of-contents is a fraction of the size and shows *all* of the 30 flags and flag reasons on five posts simultaneously, starting with the question.
+- The table-of-contents is a fraction of the size and shows *all* of the 30 active flags and flag reasons on five posts simultaneously, starting with the question.
 - The question is clearly marked as having been flagged and why. The shaded area with the colorful sidebar draws attention. Each post and comments section lists the number of active and resolved flags.
 - Comments are expanded by default and marked similarly to the post. A colorful bar drawing attention to the flagged comment with a shaded area holding the flag reason.
-- Comments are deleted by clicking the word "delete" rather than a small x button. This gives a bigger target for clicking and disambiguates between dismissing the flag and deleting the comment (not shown, see [comments section](#comment-active) below).
+- All comments (even unflagged ones) are deleted by clicking the word "delete" rather than a small x button. This gives a bigger target for clicking and disambiguates between dismissing the flag and deleting the comment (not shown, see [comments section](#comment-active) below).
 - The bar can be easily ignored without collapsing and the flags seen by scrolling through the page, if the flags are difficult to find, flag links are anchored to the relevant post or comments section; post flags link to the top of the post, comment flags link to the top of that post's comment section.
 
 <a id="new-waffle"></a> 
 ## The new Waffle Bar
 
-The improved Waffle Bar has a table-of-contents style view. Instead of listing each flag, it lists flags in a row by post, one box per post. The number of boxes per row varies based on the page width. Boxes in excess of what the page width allows will be pushed to additional rows as needed.
+The improved Waffle Bar has a table-of-contents style view. Instead of listing each flag separately, all of the flag *types* on each post are listed in a single box with a number indicating how many flags of that type are active on that post - it's worth noting particularly when dealing with comment flags that the number counts *flags* on comments, not number of comments flagged. The number of boxes per row varies based on the page width. Boxes in excess of what the page width allows are pushed to additional rows as needed.
 
 [![Seventeen simultaneously flagged posts in the Waffle Bar][1]][1]
 
 When the heights of the boxes are different, they automatically space themselves to reduce vertical area.
 
-Active flags are noted in colored text (depending on site theme), resolved flags in grey.
+Active flags are noted in colored text (depending on site theme), resolved flags in grey. To save space, if there are both active and resolved flags of the same type (e.g. comment flags), only the active ones will appear in the Waffle Bar with the number indicating the quantity of active flags. Custom moderator flags will appear individually.
 
-As with the native version of the Waffle Bar, the new implementation only appears on pages with active flags or when the last flag was just handled and the page has not yet been refreshed. This allows easy movement between posts with active flags by using the grey arrows on either upper corner of the bar. 
+As with the native version of the Waffle Bar, the new implementation only appears on pages with active flags or when the last flag was just handled and the page has not yet been refreshed. This allows easy movement between posts with active flags by using the grey arrows in either upper corner of the bar. 
 
 To remove the Waffle Bar, hit the "close" button in the upper right corner or, if there are no remaining active flags, refresh the page.
 
@@ -122,19 +130,21 @@ Inline flagging allows moderators to see the flags directly in context of the po
 <a id="post-active"></a> 
 ### Post flags
 
-Both active and resolved flags appear expanded on posts when there is at least one active flag on the post.
+Both active and resolved flags appear expanded on posts when there is at least one active flag on the post. This makes it possible to notice the flags when scanning the page, something that is impossible with the native view.
 
 [![flag banner with both active and resolved post flags][2]][2]
 
-Active flags are in dark text; resolved flags are greyed out.
+Active flags are in dark text; resolved flags are greyed out. 
 
 If the post only has one active flag (or if the same resolution can be used for all active flags), the primary "Helpful..." or "Decline..." buttons can be used to handle the flag. 
 
 - "Helpful..." results in an optional feedback text field and a button that reads "mark helpful".  
 [!["Helpful..." flagging menu][4]][4]
 
-- "Decline..." results in the four standard decline reason options in click boxes or the option of entering custom text. Flag ToC will save the last-used custom decline reason and add it to the list of options until replaced by another custom reason (in this case, "This is a dumb autoflag. Shoo.)"  
+- "Decline..." results in the four standard decline reason options in click boxes or the option of entering custom text. Flag ToC will save the last-used custom decline reason and add it to the list of options until replaced by another custom reason (in this case, "This is a dumb autoflag. Shoo!)"  
 [!["Decline..." flag menu.][5]][5]
+
+In both cases, there is a character count to indicate the minimum 10 character count (for decline only) and how close to the 200 character max the response is. Note, the text field will not allow more than 200 characters to be typed in and will crop off any pasted text at 200 characters.
 
 If the post has multiple active flags and they should not be handled in the same way or they need different feedback, hovering over the active flags will reveal a small x bearing the hover text "dismiss this flag as helpful or declined". Clicking on the x for the a flag opens a sub-option of "Helpful..." and "Decline..." that will handle that flag only. Clicking on these reveals the same options as above.
 
@@ -143,15 +153,15 @@ If the post has multiple active flags and they should not be handled in the same
 <a id="comment-active"></a> 
 ### Comment flags
 
-When viewing a post with comment flags, the entire comments section on the post will be expanded, revealing all of the non-deleted flags. There is a banner at the top of the comments section with a summary of the number of active and resolved flags.
+When viewing a post with comment flags, the entire comments section on the post will be expanded, revealing all of the non-deleted comments, making it easy to see the full context of the comment thread and all of the flagged comments. There is a banner at the top of the comments section with a summary of the number of active and resolved flags.
 
 [![Active comments banner with active and resolved flags][6]][6]
 
-Clicking the colored text (in the image above "2 active comment flags") will reveal all deleted comments and the resolved comment flags. Viewing deleted comments by clicking "[n] deleted" will not reveal which deleted comments bear resolved flags.
+Clicking the colored link text (in the image above "2 active comment flags") will reveal all deleted comments and the resolved comment flags. Viewing deleted comments by clicking "[n] deleted" will not reveal which deleted comments bear resolved flags ([see below](#comment-resolved) for more information about resolved comment flags). Remember, the number of comment flags will not necessarily indicate the number of flagged comments. If comments have multiple flags, the numbers will be different.
 
-Comments with active flags will be marked with a red bar on the left side of the comment, while comments with resolved flags will be marked with a grey bar (resolved flags will only show when viewing full flag info [see below](#comment-resolved) for more information about resolved comment flags).
+Comments with active flags will be marked with a colored bar on the left side of the comment, while comments with resolved flags will be marked with a grey bar.
 
-Each flaged comment will have a grey bar beneath it with the flag reason. On hover, the options will appear to "dismiss flags" (far left) or "delete" the comment (far right). The latter will automatically mark the flag as "helpful". If the comment should be deleted but the flag reason is incorrect, it's recommended to dismiss the flag before deleting the comment.
+Each flagged comment will have a grey bar beneath it with the flag reason. On hover, the options will appear to "dismiss flags" (far left) or "delete" the comment (far right). The latter will automatically mark the flag as "helpful". If the comment should be deleted but the flag reason is incorrect, it's recommended to dismiss the flag before deleting the comment.
 
 [![Three flagged comments, one showing options revealed on hover][7]][7]
 
@@ -159,20 +169,32 @@ If a comment has more than one type of flag, each flag will appear in a separate
 
 [![Comment with multiple flags, one no longer needed, one custom][8]][8]
 
-Unlike post flags, comment flags will not name who flagged the comment unless it is a custom comment flag. They will, however, indicate how many flags there are in a subtle way - a comma will appear for each flag in excess of one.
+Unlike post flags, comment flags will not name who flagged the comment. They will, however, indicate how many flags there are in a subtle way - a comma will appear for each flag in excess of one. 
 
 [![Comment flagged multiple times][9]][9]
 
 <a id="resolved-flags"></a> 
 ## Inline flagging - Resolved flags
 
-When all flags on a post have been resolved, viewing the page natively (rather than through the active flags page), will not show the Waffle Bar and viewing inactive flags will not cause it to appear.
+When all flags on a Q&A thread have been resolved, viewing the page will not show the Waffle Bar and viewing resolved flags on a post will not cause it to appear. If a thread has an active flag on one post and resolved flags on others, viewing resolved flags will cause the flags to populate in the Waffle Bar if it's open.
+
+When there are many deleted comments on a post, clicking "[n] resolved flags" will cause the page to jump so that the comments section appears at the top of the page. If there are also resolved post flags, it may be possible to not notice them without scrolling up. If there are only post flags, the page does not jump.
 
 <a id="post-resolved"></a> 
 ### Post flags
 
+Resolved post flags view is pretty much identical to the active flags view other than the color of the sidebar being greyed out and the addition of the date stamp and username of the moderator who handled the flag (or "Community" in cases of sufficient flagging).
+
 <a id="comment-resolved"></a> 
 ### Comment flags
+
+Viewing resolved comment flags will reveal *all* deleted comments on the post, not only the comments that were flagged. This applies whether the comments are deleted or not. Either way, the flaged comment will be marked with a vertical grey sidebar on the left side of the comment and the shaded area containing the flag reason and timestamp for when the comment was flagged along with whether the flag was marked "helpful" or "declined" and the name of the moderator who resolved the flag. In the case of sufficient flags from users, the flag handling will be attributed to "Community". 
+
+[![Deleted comments that were flagged][12]][12]
+
+Multiple flags on one comment will show multiple timestamps. As with most timestamps, it's possible to hover to see the precise date and time the flag was cast or resolved.
+
+
 
 <a id="acknowledgements"></a> 
 ## Acknowledgements
@@ -191,9 +213,10 @@ The combination of the two was a perfect match.
   [1]: https://i.stack.imgur.com/JU4tv.png
   [2]: https://i.stack.imgur.com/m29bL.png
   [3]: https://i.stack.imgur.com/Mappa.png
-  [4]: https://i.stack.imgur.com/uge2Q.png
-  [5]: https://i.stack.imgur.com/k5nMl.png
+  [4]: https://i.stack.imgur.com/g18v8.png
+  [5]: https://i.stack.imgur.com/VshpD.png
   [6]: https://i.stack.imgur.com/wAkFJ.png
   [7]: https://i.stack.imgur.com/GbKtH.png
   [8]: https://i.stack.imgur.com/P73gk.png
   [9]: https://i.stack.imgur.com/bB920.png
+  [12]: https://i.stack.imgur.com/3p5HM.png
