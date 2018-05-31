@@ -710,11 +710,14 @@ function initQuestionPage()
          // historical flag expansion
          .on("click", "a.show-all-flags", function()
          {
-            var postId = $(this)
-               .data('postid');
-            RefreshFlagsForPost(postId, true);
+            var holder = $(this).parent();
+            var postId = $(this).data('postid');
+            
+            RefreshFlagsForPost(postId, true)
+               .then(function() {
+                  holder.find('a.show-all-flags').hide();
+               });
          });
-         
    });
    
    $(document)
@@ -865,7 +868,7 @@ function initQuestionPage()
          let flagSummary = [];
          if (activeCount > 0) flagSummary.push(activeCount + " active post flags");
          if (inactiveCount) flagSummary.push(inactiveCount + " resolved post flags");
-         if (postFlags.assumeInactiveCommentFlagCount) flagSummary.push(`(*<a class='show-all-flags' data-postid='${postFlags.postId}' title='Not sure about these flags; click to load accurate information for ${postFlags.assumeInactiveCommentFlagCount} undefined flags'>load full flag info</a>)`);
+         if (postFlags.assumeInactiveCommentFlagCount || inactiveCount) flagSummary.push(`(*<a class='show-all-flags' data-postid='${postFlags.postId}' title='Not sure about these flags; click to load accurate information for ${postFlags.assumeInactiveCommentFlagCount} undefined flags'>load full flag info</a>)`);
          tools.show()
             .find("h3.flag-summary").html(flagSummary.join("; "));
       }
