@@ -150,6 +150,15 @@ If the post has multiple active flags and they should not be handled in the same
 
 [![flag banner showing Sub-options for handling one flag at a time][3]][3]
 
+When clicking through flags on the Waffle bar using the "next" and "previous" arrows, this will include questions that are currently in the 15 minute window (60 minutes on Stack Overflow) for the user review queues. If this is the only flag on that post, the Waffle bar will indicate that with a note that reads "All active flags on this page are currently in review; check back later to see if they were handled."
+
+[![Waffle bar notice reading "All active flags on this page are currently in review; check back later to see if they were handled."][13]][13]
+
+It is still possible to find and handle the flag on the page but it will appear to be a resolved flag, as shown in the image above. Clicking on the resolved flag text will open the usual active post flag with the "Helpful..." and "Decline..." options and will also add the flag to the Waffle Bar.
+
+[![Result of clicking on the resolved flag link, which opens to show the active flag and "Helpful..." and "Decline..." options][14]][14]
+
+
 <a id="comment-active"></a> 
 ### Comment flags
 
@@ -213,6 +222,8 @@ The combination of the two was a perfect match.
   [1]: https://i.stack.imgur.com/JU4tv.png
   [2]: https://i.stack.imgur.com/m29bL.png
   [3]: https://i.stack.imgur.com/Mappa.png
+  [13]: https://i.stack.imgur.com/gZH4R.png
+  [14]: https://i.stack.imgur.com/Vx13H.png
   [4]: https://i.stack.imgur.com/g18v8.png
   [5]: https://i.stack.imgur.com/VshpD.png
   [6]: https://i.stack.imgur.com/wAkFJ.png
@@ -220,3 +231,4 @@ The combination of the two was a perfect match.
   [8]: https://i.stack.imgur.com/P73gk.png
   [9]: https://i.stack.imgur.com/bB920.png
   [12]: https://i.stack.imgur.com/3p5HM.png
+  
