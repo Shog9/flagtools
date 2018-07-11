@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.899
+// @version       0.900
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -12,6 +12,7 @@
 // @include       http*://serverfault.com/questions/*
 // @include       http*://mathoverflow.net/questions/*
 // @include       http*://*.stackexchange.com/questions/*
+// @include       http*://local.mse.com/questions/*
 // @exclude       http*://chat.*.com/*
 // ==/UserScript==
 
@@ -1112,7 +1113,7 @@ function initQuestionPage()
    
       function LoadTimeline()
       {
-         return fetch("/admin/posts/timeline/" + postId, {method: "GET", credentials: "include"})
+         return fetch("/admin/posts/timeline/" + postId + "?mod=true", {method: "GET", credentials: "include"})
             .then( resp => resp.text() )
             .then( respText => new DOMParser().parseFromString(respText, "text/html") );
       }
@@ -1264,6 +1265,7 @@ function initQuestionPage()
                commentFlags: fp.find("table.comments tr .flagcount")
                   .map(function()
                   {
+                     var flagText = $(this).next(".revision-comment");
                      var flaggedComment = $(this).closest("tr");
                      var commentId = flaggedComment.attr("class")
                         .match(/comment-flagged-(\d+)/);
@@ -1271,9 +1273,20 @@ function initQuestionPage()
                      return {
                         commentId: +commentId[1],
                         active: true,
-                        description: $.trim($(this).next(".revision-comment")
-                           .html()),
-                        flaggers: Array(+$(this).text()).fill({userId: null, name: "", flagCreationDate: new Date(0)})
+                        description: $.trim(flagText.html()),
+                        flaggers: flagText.nextUntil(".flagcount", "a[href*='/users/']")
+                           .map(function()
+                           {
+                              var userId = this.href.match(/\/users\/([-\d]+)/);
+                              return {
+                                 userId: userId && userId.length > 0 ? +userId[1] : null,
+                                 name: this.textContent,
+                                 flagCreationDate: FlagFilter.tools.parseIsoDate($(this)
+                                    .nextAll(".relativetime:first")
+                                    .attr('title'), new Date(0))
+                              };
+                           })
+                           .toArray()
                      };
                   })
                   .toArray()
