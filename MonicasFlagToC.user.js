@@ -632,7 +632,6 @@ function initQuestionPage()
 {   
    var flagCache = {};
    var waffleFlags = GetFlagInfoFromWaffleBar();
-            console.log(waffleFlags)
 
    // give up on the waffle bar if it's listing all flags as handled for a given post - load full flag info.
    waffleFlags.filter(pf => pf.dirty).forEach( pf => RefreshFlagsForPost(pf.postId) );
