@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.900
+// @version       0.901
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -37,7 +37,7 @@ function with_jquery(f)
 
 with_jquery(function()
 {
-   FlagFilter = {};
+   window.FlagFilter = window.FlagFilter || {};
 
    initStyles();
    initTools();
@@ -256,7 +256,7 @@ function initStyles()
 //
 function initTools()
 {
-   FlagFilter.tools = {
+   FlagFilter.tools = $.extend({}, FlagFilter.tools, {
       CloseReasons: { Duplicate: 'Duplicate', OffTopic: 'OffTopic', Unclear: 'Unclear', TooBroad: 'TooBroad', OpinionBased: 'OpinionBased' },
       UniversalOTReasons: { Default: 1, BelongsOnSite: 2, Other: 3 },
 
@@ -625,110 +625,103 @@ function initTools()
          }
       }      
 
-   };
+   });
 }
 
 function initQuestionPage()
-{
-   var loaded = $.Deferred();
-   
+{   
    var flagCache = {};
    var waffleFlags = GetFlagInfoFromWaffleBar();
+            console.log(waffleFlags)
+
    // give up on the waffle bar if it's listing all flags as handled for a given post - load full flag info.
    waffleFlags.filter(pf => pf.dirty).forEach( pf => RefreshFlagsForPost(pf.postId) );
    RenderToCInWaffleBar();
       
-   // depending on when this gets injected, these *may* already be loaded
-   if ( $(".post-issue-display").length )
-      loaded.resolve();
-   
-   loaded.then(function()
-   {
-      initFlags();
+   StackExchange.initialized.then(initFlags);
 
-      //  Wire up prototype mod tools
-      $("#content")
-         // Comment flag dismissal
-         .on("click", ".comment .flag-dismiss", function(ev)
+   //  Wire up prototype mod tools
+   $("#content")
+      // Comment flag dismissal
+      .on("click", ".comment .flag-dismiss", function(ev)
+      {
+         ev.preventDefault();
+
+         var dismissLink = $(this);
+         var post = dismissLink.parents(".question, .answer");
+         var postId = post.data("questionid") || post.data("answerid");
+         var commentId = dismissLink.parents(".comment").attr("id").match(/comment-(\d+)/)[1];
+         var flagInfo = dismissLink.parents(".flag-info");
+         if ( !flagInfo.length )
+            flagInfo = dismissLink.parents(".comment").find(".flag-info");
+         var flagIds = flagInfo.data("flag-ids");
+         var flagListItem = flagInfo.parent();
+         if ( !commentId || !flagListItem.length )
+            return;
+
+         FlagFilter.tools.dismissAllCommentFlags(commentId, flagIds)
+            .done(function() { flagListItem.hide('medium'); dismissLink.hide(); /* annoying - don't do this RefreshFlagsForPost(postId); */  });
+      })
+
+      // Make individual flag dismissal work
+      .on("click", ".mod-tools.mod-tools-post .flag-dismiss", function()
+      {
+         var post = $(this).parents(".question, .answer");
+         var postId = post.data("questionid") || post.data("answerid");
+         var flagIds = $(this).parents(".flag-info").data("flag-ids");
+         var flagListItem = $(this).parents(".flag-info").parent();
+         if ( !postId || !flagIds || !flagListItem.length )
+            return;
+
+         FlagFilter.tools.flagDismissUI(flagListItem).then(function(dismissal)
          {
-            ev.preventDefault();
+            FlagFilter.tools.dismissFlag(postId, flagIds, dismissal.helpful, dismissal.declineId, dismissal.comment)
+               .done(function(){ flagListItem.hide('medium'); RefreshFlagsForPost(postId); });
+         });
+      })
 
-            var dismissLink = $(this);
-            var post = dismissLink.parents(".question, .answer");
-            var postId = post.data("questionid") || post.data("answerid");
-            var commentId = dismissLink.parents(".comment").attr("id").match(/comment-(\d+)/)[1];
-            var flagInfo = dismissLink.parents(".flag-info");
-            if ( !flagInfo.length )
-               flagInfo = dismissLink.parents(".comment").find(".flag-info");
-            var flagIds = flagInfo.data("flag-ids");
-            var flagListItem = flagInfo.parent();
-            if ( !commentId || !flagListItem.length )
-               return;
+      // Make "dismiss all" work
+      .on("click", ".mod-tools .flag-dismiss-all-helpful, .mod-tools .flag-dismiss-all-decline", function()
+      {
+         var btn = $(this);
+         var post = btn.parents(".question, .answer");
+         var postId = post.data("questionid") || post.data("answerid");
+         
+         var choice = btn.is(".flag-dismiss-all-helpful") 
+            ? FlagFilter.tools.flagHelpfulUI(btn.parent())
+            : FlagFilter.tools.flagDeclineUI(btn.parent());
 
-            FlagFilter.tools.dismissAllCommentFlags(commentId, flagIds)
-               .done(function() { flagListItem.hide('medium'); dismissLink.hide(); /* annoying - don't do this RefreshFlagsForPost(postId); */  });
-         })
-
-         // Make individual flag dismissal work
-         .on("click", ".mod-tools.mod-tools-post .flag-dismiss", function()
+         choice.then(function(dismissal)
          {
-            var post = $(this).parents(".question, .answer");
-            var postId = post.data("questionid") || post.data("answerid");
-            var flagIds = $(this).parents(".flag-info").data("flag-ids");
-            var flagListItem = $(this).parents(".flag-info").parent();
-            if ( !postId || !flagIds || !flagListItem.length )
-               return;
-
-            FlagFilter.tools.flagDismissUI(flagListItem).then(function(dismissal)
-            {
-               FlagFilter.tools.dismissFlag(postId, flagIds, dismissal.helpful, dismissal.declineId, dismissal.comment)
-                  .done(function(){ flagListItem.hide('medium'); RefreshFlagsForPost(postId); });
-            });
-         })
-
-         // Make "dismiss all" work
-         .on("click", ".mod-tools .flag-dismiss-all-helpful, .mod-tools .flag-dismiss-all-decline", function()
-         {
-            var btn = $(this);
-            var post = btn.parents(".question, .answer");
-            var postId = post.data("questionid") || post.data("answerid");
-            
-            var choice = btn.is(".flag-dismiss-all-helpful") 
-               ? FlagFilter.tools.flagHelpfulUI(btn.parent())
-               : FlagFilter.tools.flagDeclineUI(btn.parent());
-
-            choice.then(function(dismissal)
-            {
-               FlagFilter.tools.dismissAllFlags(postId, dismissal.helpful, dismissal.declineId, dismissal.comment)
-                  .done(function()
-                  { 
-                     post.find('tr.mod-tools').slideUp(); 
-                     RefreshFlagsForPost(postId).then( () => post.find('tr.mod-tools').sideDown('fast') ); 
-                  });
-            });
-         })
-
-         // historical flag expansion
-         .on("click", "a.show-all-flags", function()
-         {
-            var holder = $(this).parent();
-            var postId = $(this).data('postid');
-            
-            RefreshFlagsForPost(postId, true)
-               .then(function() {
-                  holder.find('a.show-all-flags').hide();
+            FlagFilter.tools.dismissAllFlags(postId, dismissal.helpful, dismissal.declineId, dismissal.comment)
+               .done(function()
+               { 
+                  post.find('tr.mod-tools').slideUp(); 
+                  RefreshFlagsForPost(postId).then( () => post.find('tr.mod-tools').sideDown('fast') ); 
                });
          });
-   });
+      })
+
+      // historical flag expansion
+      .on("click", "a.show-all-flags", function()
+      {
+         var holder = $(this).parent();
+         var postId = $(this).data('postid');
+         var link = holder.find('a.show-all-flags');
+         var spinner = $("<span>loading<img src='//sstatic.net/img/progress-dots.gif'></span>");
+         spinner.insertAfter(link.hide());
+         
+         RefreshFlagsForPost(postId, true)
+            .catch(function() {
+               link.show();
+               spinner.remove();
+            });
+      });
    
    $(document)
       .ajaxSuccess(function(event, XMLHttpRequest, ajaxOptions)
       {
-         if (ajaxOptions.url.indexOf("/admin/posts/issues/") == 0)
-         {
-            setTimeout(() =>loaded.resolve(), 1);
-         }
-         else if (/\/posts\/\d+\/comments/.test(ajaxOptions.url))
+         if (/\/posts\/\d+\/comments/.test(ajaxOptions.url))
          {
             var postId = +ajaxOptions.url.match(/\/posts\/(\d+)\/comments/)[1];
             setTimeout(() => ShowCommentFlags(postId), 1);
@@ -747,8 +740,6 @@ function initQuestionPage()
             setTimeout(() => RefreshFlagsForPost(postId), 1);
          }
       });
-   
-   return loaded.promise();
       
    function RefreshFlagsForPost(postId, expandComments)
    {
@@ -767,11 +758,11 @@ function initQuestionPage()
       {
          var postContainer = $(this),
             postId = postContainer.data('questionid') || postContainer.data('answerid'),
-            issues = postContainer.find(".post-issue-display"),
+            issues = postContainer.find(".js-post-issues"),
             flagsLink = issues.find("a[href='/admin/posts/" + postId + "/show-flags']"),
             commentsLink = issues.find("a[href='/admin/posts/" + postId + "/comments']"),
             flags = flagCache[postId],
-            totalFlags = flagsLink.length ? flagsLink.text().match(/\d+/)[0] : 0;
+            totalFlags = flagsLink.length ? +flagsLink.text().match(/\d+/)[0] : 0;
 
          if (!flagsLink.length) return;
 
@@ -869,7 +860,8 @@ function initQuestionPage()
          let flagSummary = [];
          if (activeCount > 0) flagSummary.push(activeCount + " active post flags");
          if (inactiveCount) flagSummary.push(inactiveCount + " resolved post flags");
-         if (postFlags.assumeInactiveCommentFlagCount || inactiveCount) flagSummary.push(`(*<a class='show-all-flags' data-postid='${postFlags.postId}' title='Not sure about these flags; click to load accurate information for ${postFlags.assumeInactiveCommentFlagCount} undefined flags'>load full flag info</a>)`);
+         if (postFlags.assumeInactiveCommentFlagCount) flagSummary.push(`(*<a class='show-all-flags' data-postid='${postFlags.postId}' title='Not sure about these flags; click to load accurate information for ${postFlags.assumeInactiveCommentFlagCount} undefined flags'>load full flag info</a>)`);
+         
          tools.show()
             .find("h3.flag-summary").html(flagSummary.join("; "));
       }
@@ -883,7 +875,7 @@ function initQuestionPage()
       
       if (postFlags.commentFlags.length && forceCommentVisibility)
       {
-         let issues = postContainer.find(".post-issue-display"),
+         let issues = postContainer.find(".js-post-issues"),
             moreCommentsLink = $("#comments-link-" + postFlags.postId + " a.js-show-link:last:visible"),
             deletedCommentsLink = issues.find("a[href='/admin/posts/" + postFlags.postId + "/comments']"),
             inactiveCommentFlags = !postFlags.commentFlags.every(f => f.active);
@@ -1113,7 +1105,7 @@ function initQuestionPage()
    
       function LoadTimeline()
       {
-         return fetch("/admin/posts/timeline/" + postId + "?mod=true", {method: "GET", credentials: "include"})
+         return fetch("/posts/" + postId + "/timeline?mod=true", {method: "GET", credentials: "include"})
             .then( resp => resp.text() )
             .then( respText => new DOMParser().parseFromString(respText, "text/html") );
       }
@@ -1269,13 +1261,14 @@ function initQuestionPage()
                      var flaggedComment = $(this).closest("tr");
                      var commentId = flaggedComment.attr("class")
                         .match(/comment-flagged-(\d+)/);
+                     var flaggers = flagText.nextUntil(".flagcount", "a[href*='/users/']");
                      if (!commentId || commentId.length < 2) return;
                      return {
                         commentId: +commentId[1],
                         active: true,
                         description: $.trim(flagText.html()),
-                        flaggers: flagText.nextUntil(".flagcount", "a[href*='/users/']")
-                           .map(function()
+                        flaggers: flaggers.length 
+                           ? flaggers.map(function()
                            {
                               var userId = this.href.match(/\/users\/([-\d]+)/);
                               return {
@@ -1285,8 +1278,8 @@ function initQuestionPage()
                                     .nextAll(".relativetime:first")
                                     .attr('title'), new Date(0))
                               };
-                           })
-                           .toArray()
+                           }).toArray()
+                           : Array(+$(this).text()).fill({userId: null, name: "", flagCreationDate: new Date(0)})
                      };
                   })
                   .toArray()
@@ -1296,7 +1289,7 @@ function initQuestionPage()
             flagCache[ret.postId] = ret;
             return ret;
          })
-         .toArray();
+         .toArray();         
    }
 
 }
