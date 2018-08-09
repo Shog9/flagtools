@@ -67,15 +67,15 @@ This script will only work for diamond moderators or staff of the Stack Exchange
 
 ### Compatible Moderator Userscripts
 
-This is a brief list of Moderator Userscripts that are known to be usable (or not) in conjunction with Flag ToC on the question page. Userscript links below are to RAW install files.
+This is a brief list of Moderator Userscripts that are known to be usable in conjunction with Flag ToC on the question page. Userscript links below are to RAW install files.
 
 #### Compatible:
 - [animuson](https://github.com/animuson)'s [Stack Exchange Moderator Tools Improved (SEMTI)](https://github.com/animuson/se-mod-tools-improved/raw/master/better-mod-tools.user.js).
 - [ArtOfCode](https://github.com/ArtOfCode-)'s [Move SE Mod Info](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/move_mod_info.user.js)
 
-
 #### Incompatible:
-- ArtOfCode's [Show Comment Flagger](https://github.com/ArtOfCode-/Userscripts/raw/master/stackexchange/mod/comment_flagger.user.js) userscript is not compatible with Flag ToC, so having it will not reveal who flagged comments on the question page while Flag ToC is active. Flagger usernames can still be viewed on the flags dashboard or by temporarily disabling Flag ToC. Both userscripts can be active simultaneously without causing any errors.
+
+None known. Previous incompatibility with Show Comment Flagger ended when comment flaggers became shown to all mods by default.
 
 <a id="overview"></a> 
 ## Overview
