@@ -518,27 +518,28 @@ function initTools()
 
 function initQuestionPage()
 {
-   if ( localStorage.flaaaaags )
-   {
-      $(".nav-button.next")
-         .addClass("filtered-nav")
-         .attr("title", "go to the next filtered flag")
-         .off("click")
-         .removeClass("nav-button")
-         .click(function(e) { return goToFilteredFlag(1) });
-      $(".nav-button.prev")
-         .addClass("filtered-nav")
-         .attr("title", "go to the previous filtered flag")
-         .off("click")
-         .removeClass("nav-button")
-         .click(function(e) { return goToFilteredFlag(-1) });
+   if ( !localStorage.flaaaaags ) return;
 
-      // show progress
-      var filtered = localStorage.flaaaaags.split(',');
-      var index = filtered.indexOf(location.pathname.match(/\/questions\/(\d+)/)[1]);
-      $("#postflag-bar .flag-wrapper, #postflag-bar .flag-summary").first()
-            .prepend(`<div><a href="${localStorage.getItem("flaaaaags.lastFilter")}">Processing filtered flags: ${localStorage.getItem("flaaaaags.lastFilterName")}</a> ${(index+1)} of ${filtered.length}</div>`);
-   }
+   var filtered = localStorage.flaaaaags.split(',');
+   var index = filtered.indexOf(location.pathname.match(/\/questions\/(\d+)/)[1]);
+   if ( index < 0 ) return;
+      
+   $(".nav-button.next")
+      .addClass("filtered-nav")
+      .attr("title", "go to the next filtered flag")
+      .off("click")
+      .removeClass("nav-button")
+      .click(function(e) { return goToFilteredFlag(1) });
+   $(".nav-button.prev")
+      .addClass("filtered-nav")
+      .attr("title", "go to the previous filtered flag")
+      .off("click")
+      .removeClass("nav-button")
+      .click(function(e) { return goToFilteredFlag(-1) });
+
+   // show progress
+   $("#postflag-bar .flag-wrapper, #postflag-bar .flag-summary").first()
+         .prepend(`<div><a href="${localStorage.getItem("flaaaaags.lastFilter")}">Processing filtered flags: ${localStorage.getItem("flaaaaags.lastFilterName")}</a> ${(index+1)} of ${filtered.length}</div>`);
 }
 
 //
