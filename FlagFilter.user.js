@@ -3,7 +3,7 @@
 // @description   Alternate flag dashboard UI scratchpad
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       4
+// @version       5
 // @include       http*://stackoverflow.com/*
 // @include       http*://*.stackoverflow.com/*
 // @include       http*://dev.stackoverflow.com/*
