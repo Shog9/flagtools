@@ -36,8 +36,41 @@ function with_jquery(f)
 
 with_jquery(function()
 {
-   FlagFilter = {};
-   // crap I'd normally load separately
+   window.FlagFilter = window.FlagFilter || {};   
+
+   $(function()
+   {
+      initRoute();
+   });
+   
+function initRoute()
+{
+   if (/^\/admin/.test(window.location.pathname))
+   {
+      // add tab so we can find this thing
+      $("#tabs a[href='/admin/dashboard']")
+         .after('<a href="/admin/flags" title="a simple list of all pending flags with fast filtering">filtered flags</a>');
+   }
+
+   if (/^\/admin\/flags\/?$/.test(window.location.pathname) )
+   {
+      initStyles();
+      initTools();
+      initFlagFilter();
+   }
+   
+   if (/^\/questions\//.test(window.location.pathname))
+   {
+      initStyles();
+      initQuestionPage();
+   }   
+}
+   
+function initStyles()
+{
+// crap I'd normally load separately
+   
+   
 // doT.js
 // 2011, Laura Doktorova, https://github.com/olado/doT
 // Licensed under the MIT license.
@@ -179,7 +212,7 @@ with_jquery(function()
 // Templates
 FlagFilter.templates = {"flag": function(it
 /**/) {
-var out='<h3><a href=\''+(it.url||'').toString().encodeHTML()+'\'>'+(it.title||'').toString().encodeHTML()+'</a></h3><div class="tags">';var arr1=it.tags;if(arr1){var tag,i1=-1,l1=arr1.length-1;while(i1<l1){tag=arr1[i1+=1];out+=' <a href="/questions/tagged/'+(tag||'').toString().encodeHTML()+'" class="post-tag" title="show questions tagged \''+(tag||'').toString().encodeHTML()+'\'" rel="tag">'+(tag||'').toString().encodeHTML()+'</a>';} } out+='</div><div class="author"> created <span title="'+(it.created)+'" class="relativetime"> '+(FlagFilter.tools.formatDate(it.created)||'').toString().encodeHTML()+' </span>';if(it.author){out+=' <a href=\''+(it.author.url||'').toString().encodeHTML()+'\'>'+(it.author.name||'').toString().encodeHTML()+'</a>';}else{out+=' unknown';}out+='</div><ul class="flagList">';var arr2=it.flags;if(arr2){var flag,i2=-1,l2=arr2.length-1;while(i2<l2){flag=arr2[i2+=1];out+=' <li>'+(flag.description)+' ';if(flag.relatedPosts){out+=' <ul> ';var arr3=flag.relatedPosts;if(arr3){var rpost,i3=-1,l3=arr3.length-1;while(i3<l3){rpost=arr3[i3+=1];out+=' <li><a href=\''+(rpost.url||'').toString().encodeHTML()+'\'>'+(rpost.title||'').toString().encodeHTML()+'</a></li> ';} } out+=' </ul> ';}out+=' - ';var arr4=flag.flaggers;if(arr4){var flagger,i=-1,l4=arr4.length-1;while(i<l4){flagger=arr4[i+=1];out+=' <a href=\''+(flagger.url||'').toString().encodeHTML()+'\'>'+(flagger.name||'').toString().encodeHTML()+'</a> ('+(flagger.helpfulFlags||0)+'/'+(flagger.declinedFlags||0)+'), ';} } out+=' <span title="'+(flag.created)+'" class="relativetime"> '+(FlagFilter.tools.formatDate(flag.created)||'').toString().encodeHTML()+' </span> </li>';} } out+='</ul>';return out;
+var out='<h3><a href=\''+(it.url||'').toString().encodeHTML()+'\'>'+(it.title||'').toString().encodeHTML()+'</a></h3><div class="tags">';var arr1=it.tags;if(arr1){var tag,i1=-1,l1=arr1.length-1;while(i1<l1){tag=arr1[i1+=1];out+=' <a href="/questions/tagged/'+(tag||'').toString().encodeHTML()+'" class="post-tag" title="show questions tagged \''+(tag||'').toString().encodeHTML()+'\'" rel="tag">'+(tag||'').toString().encodeHTML()+'</a>';} } out+='</div><div class="author"> created <span title="'+FlagFilter.tools.formatISODate(it.created)+'" class="relativetime"> '+(FlagFilter.tools.formatDate(it.created)||'').toString().encodeHTML()+' </span>';if(it.author){out+=' <a href=\''+(it.author.url||'').toString().encodeHTML()+'\'>'+(it.author.name||'').toString().encodeHTML()+'</a>';}else{out+=' unknown';}out+='</div><ul class="flagList">';var arr2=it.flags;if(arr2){var flag,i2=-1,l2=arr2.length-1;while(i2<l2){flag=arr2[i2+=1];out+=' <li>'+(flag.description)+' ';if(flag.relatedPosts){out+=' <ul> ';var arr3=flag.relatedPosts;if(arr3){var rpost,i3=-1,l3=arr3.length-1;while(i3<l3){rpost=arr3[i3+=1];out+=' <li><a href=\''+(rpost.url||'').toString().encodeHTML()+'\'>'+(rpost.title||'').toString().encodeHTML()+'</a></li> ';} } out+=' </ul> ';}out+=' - ';var arr4=flag.flaggers;if(arr4){var flagger,i=-1,l4=arr4.length-1;while(i<l4){flagger=arr4[i+=1];out+=' <a href=\''+(flagger.url||'').toString().encodeHTML()+'\'>'+(flagger.name||'').toString().encodeHTML()+'</a> ('+(flagger.helpfulFlags||0)+'/'+(flagger.declinedFlags||0)+'), ';} } out+=' <span title="'+FlagFilter.tools.formatISODate(flag.created)+'" class="relativetime"> '+(FlagFilter.tools.formatDate(flag.created)||'').toString().encodeHTML()+' </span> </li>';} } out+='</ul>';return out;
 },
 "flagFilter": function(it
 /**/) {
@@ -218,15 +251,44 @@ flagStyles.textContent = `#flaggedPosts
    font-size: 16px;
 }
 
-#postflag-bar .nav-button.filtered-nav
+#postflag-bar .filtered-nav
 {
+   position: absolute;
+   min-height: 40px;
+   padding: 2px;
+   top: 0;
+   bottom: 0;
+   font-size: 20px;   
+   cursor: pointer;
    width: 30px;
    background-color: #33a030;
 }
 
-#postflag-bar .migration-link
+#postflag-bar .filtered-nav.next
 {
-	float: right;
+   text-align: left;
+   border-left: 1px solid #9fa6ad;
+   right: 0;
+}
+
+#postflag-bar .filtered-nav.prev
+{
+   text-align: right;
+   border-right: 1px solid #9fa6ad;
+   left: 0;
+}
+
+#postflag-bar .filtered-nav a
+{
+   color: #FFF;
+}
+#postflag-bar .filtered-nav a:hover
+{
+   text-decoration: none;
+}
+#postflag-bar .filtered-nav:hover a
+{
+   color: #6a737c;
 }
 
 ul.flagList
@@ -270,26 +332,6 @@ ul.flagList
 `;
 
 document.head.appendChild(flagStyles);
-
-
-$(function()
-{
-   initRoute();
-
-function initRoute()
-{
-   if (/^\/admin/.test(window.location.pathname))
-   {
-      // add tab so we can find this thing
-      $("#tabs a[href='/admin/dashboard']")
-         .after('<a href="/admin/flags" title="a simple list of all pending flags with fast filtering">filtered flags</a>');
-   }
-
-   if (/^\/admin\/flags\/?$/.test(window.location.pathname) )
-   {
-      initTools();
-      initFlagFilter();
-   }
 }
 
 //
@@ -314,7 +356,10 @@ function goToFilteredFlag(delta)
    var filtered = localStorage.flaaaaags.split(',');
    var index = filtered.indexOf(location.pathname.match(/\/questions\/(\d+)/)[1]);
    if ( index+delta >= 0 && index+delta < filtered.length )
+   {
       window.location.pathname = "/questions/" + filtered[index+delta];
+      return false;
+   }
 }
 
 
@@ -324,7 +369,7 @@ function goToFilteredFlag(delta)
 //
 function initTools()
 {
-   FlagFilter.tools = {
+   FlagFilter.tools = $.extend({}, FlagFilter.tools, {
       CloseReasons: { Duplicate: 'Duplicate', OffTopic: 'OffTopic', Unclear: 'Unclear', TooBroad: 'TooBroad', OpinionBased: 'OpinionBased' },
       UniversalOTReasons: { Default: 1, BelongsOnSite: 2, Other: 3 },
 
@@ -380,14 +425,57 @@ function initTools()
          return $.post('/admin/review/ban-user', params);
       },
 
-
-      formatDate: function(isoDate)
+      // hate safari
+      parseISODate: function(isoDate, def)
       {
-         return (new Date(isoDate.replace(/\s/,'T')))
-            .toLocaleDateString(undefined, {year: "numeric", month: "short", day: "numeric", timeZone: "UTC"});
+         var parsed = Date.parse((isoDate||'').replace(' ','T'));
+         return parsed ? new Date(parsed) : def;
       },
 
-      dismissAllCommentFlags: function(commentId, flagId)
+      formatDate: function(date)
+      {
+         if ( !date.getTime() ) return "(??)";
+         
+         // mostly stolen from SE.com
+         var delta = (((new Date()).getTime() - date.getTime()) / 1000);
+
+         if (delta < 2) {
+            return 'just now';
+         }
+         if (delta < 60) {
+            return Math.floor(delta) + ' secs ago';
+         }
+         if (delta < 120) {
+            return '1 min ago';
+         }
+         if (delta < 3600) {
+            return Math.floor(delta / 60) + ' mins ago';
+         }
+         if (delta < 7200) {
+            return '1 hour ago';
+         }
+         if (delta < 86400) {
+            return Math.floor(delta / 3600) + ' hours ago';
+         }
+         if (delta < 172800) {
+            return 'yesterday';
+         }
+         if (delta < 259200) {
+            return '2 days ago';
+         }
+         return date.toLocaleString(undefined, {month: "short", timeZone: "UTC"})
+            + ' ' + date.toLocaleString(undefined, {day: "2-digit", timeZone: "UTC"})
+            + ( delta > 31536000 ? ' \'' + date.toLocaleString(undefined, {year: "2-digit", timeZone: "UTC"}) : '')
+            + ' at' 
+            + ' ' + date.toLocaleString(undefined, {minute: "2-digit", hour: "2-digit", hour12: false, timeZone: "UTC"});
+      },
+      
+      formatISODate: function(date)
+      {
+         return date.toJSON().replace(/\.\d+Z/, 'Z');        
+      },
+
+      dismissAllCommentFlags: function(commentId, flagIds)
       {
          // although the UI implies it's possible, we can't currently dismiss individual comment flags
         return $.post('/admin/comment/' + commentId+ '/clear-flags', {fkey:StackExchange.options.user.fkey});
@@ -424,49 +512,33 @@ function initTools()
             setTimeout(function() { result.resolve.apply(result, args) }, msecs);
             return result.promise();
          }
-      },
-      
-      
-      flagDismissUI: function(uiParent)
-      {
-         var result = $.Deferred();
-         var dismissTools = $('<div class="dismiss-flags-popup"><input type="text" maxlength="200" style="width:98%" placeholder="optional feedback (visible to the user)"><br><br><input type="button" value="helpful" title="the flags have merit but no further action is required"> &nbsp; &nbsp; <input type="button" value="decline: technical" title="errors are not mod biz"> <input type="button" value="decline: no evidence" title="to support these flags"> <input type="button" value="decline: no mods needed"  title="to handle these flags"> <input type="button" value="decline: standard flags"  title="Using standard flags helps us prioritize problems and resolve them faster. Please familiarize yourself with the list of standard flags"></div>');
-
-         dismissTools
-            .appendTo(uiParent)
-            .slideDown();
-
-         dismissTools.find("input[value='helpful']").click(function()
-         {
-            // dismiss as helpful
-            dismissTools.remove();
-            result.resolve({helpful: true, declineId: 0, comment: dismissTools.find("input[type=text]").val()});
-         });
-         dismissTools.find("input[value='decline: technical']").click(function()
-         {
-            dismissTools.remove();
-            result.resolve({helpful: false, declineId: 1, comment: dismissTools.find("input[type=text]").val()});
-         });
-         dismissTools.find("input[value='decline: no evidence']").click(function()
-         {
-            dismissTools.remove();
-            result.resolve({helpful: false, declineId: 2, comment: dismissTools.find("input[type=text]").val()});
-         });
-         dismissTools.find("input[value='decline: no mods needed']").click(function()
-         {
-            dismissTools.remove();
-            result.resolve({helpful: false, declineId: 3, comment: dismissTools.find("input[type=text]").val()});
-         });
-         dismissTools.find("input[value='decline: standard flags']").click(function()
-         {
-            dismissTools.remove();
-            result.resolve({helpful: false, declineId: 4, comment: dismissTools.find("input[type=text]").val()});
-         });
-         
-         return result.promise();
       }
+   });
+}
 
-   };
+function initQuestionPage()
+{
+   if ( localStorage.flaaaaags )
+   {
+      $(".nav-button.next")
+         .addClass("filtered-nav")
+         .attr("title", "go to the next filtered flag")
+         .off("click")
+         .removeClass("nav-button")
+         .click(function(e) { return goToFilteredFlag(1) });
+      $(".nav-button.prev")
+         .addClass("filtered-nav")
+         .attr("title", "go to the previous filtered flag")
+         .off("click")
+         .removeClass("nav-button")
+         .click(function(e) { return goToFilteredFlag(-1) });
+
+      // show progress
+      var filtered = localStorage.flaaaaags.split(',');
+      var index = filtered.indexOf(location.pathname.match(/\/questions\/(\d+)/)[1]);
+      $("#postflag-bar .flag-wrapper, #postflag-bar .flag-summary").first()
+            .prepend(`<div><a href="${localStorage.getItem("flaaaaags.lastFilter")}">Processing filtered flags: ${localStorage.getItem("flaaaaags.lastFilterName")}</a> ${(index+1)} of ${filtered.length}</div>`);
+   }
 }
 
 //
@@ -483,34 +555,33 @@ function initFlagFilter()
 
    $("<div id='filterbox' style='position:fixed;bottom:0;left:0;width:100%;z-index:10000;background:white;'><hr><span style='float:right;padding-right:10em;' id='flagCount'></span> Filter: <input id='flagfilter' style='width:50%'></div>")
          .appendTo('body')
+   
+   LoadAllFlags().then(function(fp)
+   {
+      FlagFilter.flaggedPosts = flaggedPosts = fp.sort(function(a,b){return b.flags.length-a.flags.length;});
 
-   $.get('/admin/all-flags')
-      .done(function(fp)
+      initializing = false;
+
+      renderFilters(flaggedPosts, $('#flagFilters'));
+
+      restoreFilter();
+
+      var filterDelay;
+      $("#flagfilter").keyup(function()
       {
-         FlagFilter.flaggedPosts = flaggedPosts = fp.sort(function(a,b){return b.flags.length-a.flags.length;});
+        var filter = $(this).val();
 
-         initializing = false;
+        if ( filterDelay)
+            clearTimeout(filterDelay);
 
-         renderFilters(flaggedPosts, $('#flagFilters'));
-
-         restoreFilter();
-
-         var filterDelay;
-         $("#flagfilter").keyup(function()
+        filterDelay = setTimeout(function()
          {
-           var filter = $(this).val();
-
-           if ( filterDelay)
-               clearTimeout(filterDelay);
-
-           filterDelay = setTimeout(function()
-            {
-               filterDelay=null;
-               setFilter(filter);
-            }, 600);
-         });
-
+            filterDelay=null;
+            setFilter(filter);
+         }, 600);
       });
+
+   });
 
    $("#flagFilters").on("click", ".flagFilter a", function(ev)
       {
@@ -522,6 +593,34 @@ function initFlagFilter()
    $(window).on('popstate', restoreFilter);
 
    $("#flagSort input[name=sort]").click(restoreFilter);
+      
+   function LoadAllFlags()
+   {
+      var ret = $.Deferred();
+   
+      fetch("/admin/all-flags", {method: "GET", credentials: "include"})
+         .then( resp => resp.json() )
+         .then( 
+            function(respJSON) { ret.resolve(ParseDates(respJSON)) },
+            function(err) { ret.reject(err) }
+         );
+      
+      return ret.promise();
+      
+      function ParseDates(flagJSON)
+      {
+         for (let post of flagJSON)
+         {
+            post.created = FlagFilter.tools.parseISODate(post.created);
+            if ( post.closed ) post.closed = FlagFilter.tools.parseISODate(post.closed);
+            if ( post.deleted ) post.deleted = FlagFilter.tools.parseISODate(post.deleted);
+            
+            for (let flag of post.flags)
+               flag.created = FlagFilter.tools.parseISODate(flag.created);
+         }
+         return flagJSON;
+      }
+   }
       
    function restoreFilter()
    {
@@ -553,6 +652,7 @@ function initFlagFilter()
       localStorage.setItem("flaaaaags",
          unique(sortedCollapsedFilteredFlaggedPosts.map(function(p) { return p.questionId; })).join(','));
       localStorage.setItem("flaaaaags.lastFilter", location.toString());
+      localStorage.setItem("flaaaaags.lastFilterName", getNameForFilter(filter));
 
       $('#flaggedPosts').empty();
       renderFlags(sortedCollapsedFilteredFlaggedPosts).then(function()
@@ -563,25 +663,34 @@ function initFlagFilter()
       });
 
       $("#flagCount").text(filteredFlaggedPosts.length + " flagged posts");
+      
+      function getNameForFilter(f)
+      {
+         f = encodeURIComponent(f);
+         for (let cat of FlagFilter.filters)
+            for (let filter of cat.filters)
+               if ( filter.search === f ) return cat.category + ": " + filter.name;
+         return "";
+      }      
 
       function getSortFunction()
       {
          var sortFuncs = {
             postDesc: function(a,b)
             {
-               return new Date(a.created.replace(/\s/,'T'))-new Date(b.created.replace(/\s/,'T'));
+               return a.created - b.created;
             },
             postAsc: function(b,a)
             {
-               return new Date(a.created.replace(/\s/,'T'))-new Date(b.created.replace(/\s/,'T'));
+               return a.created - b.created;
             },
             flagDesc: function(a,b)
             {
-               return new Date(a.flags[0].created.replace(/\s/,'T'))-new Date(b.flags[0].created.replace(/\s/,'T'));
+               return a.flags[0].created - b.flags[0].created;
             },
             flagAsc: function(b,a)
             {
-               return new Date(a.flags[0].created.replace(/\s/,'T'))-new Date(b.flags[0].created.replace(/\s/,'T'));
+               return a.flags[0].created - b.flags[0].created;
             },
             netHelpfulDesc: function(b,a)
             {
@@ -605,7 +714,7 @@ function initFlagFilter()
          return flaggedPosts.map(function(fp)
          {
             var collapsedFlags = fp.flags
-               .sort(function(a,b) { return new Date(a.created.replace(/\s/,'T'))-new Date(b.created.replace(/\s/,'T')); }) // oldest flag in a group wins
+               .sort(function(a,b) { return a.created - b.created; }) // oldest flag in a group wins
                .reduce(function(cf, flag)
                {
                   if ( !cf[flag.description] )
@@ -709,8 +818,8 @@ function initFlagFilter()
 
          isquestion: function() { return this.questionId==this.postId; },
          isanswer: function() { return this.questionId!=this.postId; },
-         isdeleted: function() { return this.deleted; },
-         isclosed: function() { return this.closed; },
+         isdeleted: function() { return !!this.deleted; },
+         isclosed: function() { return !!this.closed; },
          isanswered: function() { return this.hasAcceptedAnswer; },
          isaccepted: function() { return this.isAcceptedAnswer; }
       };
@@ -831,7 +940,8 @@ function initFlagFilter()
 
    function renderFilters(flaggedPosts, container)
    {
-      container.html(FlagFilter.templates.flagFilter(buildFilters(flaggedPosts)));
+      FlagFilter.filters = buildFilters(flaggedPosts);
+      container.html(FlagFilter.templates.flagFilter(FlagFilter.filters));
    }
 
    function unique(arr)
@@ -883,6 +993,4 @@ function initFlagFilter()
    
 }
    
-});
-
 });

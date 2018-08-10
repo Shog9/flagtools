@@ -54,6 +54,21 @@ function initStyles()
       display: none; 
       background-color: rgba( 239,240,241, 0.75);
       opacity: 1;
+      z-index: 1050; -- rise above left sidebar
+   }
+   
+   #postflag-bar>div
+   {
+      display: grid;
+   }
+   
+   #postflag-bar .flag-summary
+   {
+      display: flex;
+      flex: 1 auto;
+      flex-direction: column;
+      margin-left: 40px;
+      margin-right: 40px;
    }
    
    .flagToC
@@ -61,8 +76,6 @@ function initStyles()
       list-style-type: none;
       margin: 0px;
       padding: 0px;
-      margin-left: 40px;
-      margin-right: 40px;
    }
    
    .flagToC>li
@@ -313,7 +326,7 @@ function initTools()
       },
 
       // hate safari
-      parseIsoDate: function(isoDate, def)
+      parseISODate: function(isoDate, def)
       {
          var parsed = Date.parse((isoDate||'').replace(' ','T'));
          return parsed ? new Date(parsed) : def;
@@ -1074,7 +1087,8 @@ function initQuestionPage()
          flagToC = $("<div style='padding:4px; background:white;' class='mx24'>All active flags on this page are currently in review; check back later to see if they were handled.</div>");
       
       $('#postflag-bar .flag-wrapper, #postflag-bar .flagToC').remove();
-      $('#postflag-bar').append(flagToC).show();
+      $("<div class='flag-summary grid fl1 fd-column'>").insertAfter('#postflag-bar .nav-button.prev').append(flagToC);
+      $('#postflag-bar').show();
 
       function SummarizeFlags(flaggedPost, maxEntries)
       {
@@ -1151,7 +1165,7 @@ function initQuestionPage()
                description: (description && description.innerHTML.trim()) || (flagType && flagType.textContent.trim()) || "",
                active: !deleted,
                result: (result && result.textContent.trim()) || "",
-               resultDate: deleted ? FlagFilter.tools.parseIsoDate(deleted.title) : null,
+               resultDate: deleted ? FlagFilter.tools.parseISODate(deleted.title) : null,
                resultUser:
                {
                   userId: mod ? +mod.href.match(/\/users\/([-\d]+)/)[1] : -1,
@@ -1161,7 +1175,7 @@ function initQuestionPage()
                {
                   userId: flagger ? +flagger.href.match(/\/users\/([-\d]+)/)[1] : -1,
                   name: (flagger && flagger.textContent.trim()) || "",
-                  flagCreationDate: FlagFilter.tools.parseIsoDate(created.title)
+                  flagCreationDate: FlagFilter.tools.parseISODate(created.title)
                }]
             };
                
@@ -1243,7 +1257,7 @@ function initQuestionPage()
                               return {
                                  userId: userId && userId.length > 0 ? +userId[1] : null,
                                  name: this.textContent,
-                                 flagCreationDate: FlagFilter.tools.parseIsoDate($(this)
+                                 flagCreationDate: FlagFilter.tools.parseISODate($(this)
                                     .nextAll(".relativetime:first")
                                     .attr('title'), new Date(0))
                               };
@@ -1273,7 +1287,7 @@ function initQuestionPage()
                               return {
                                  userId: userId && userId.length > 0 ? +userId[1] : null,
                                  name: this.textContent,
-                                 flagCreationDate: FlagFilter.tools.parseIsoDate($(this)
+                                 flagCreationDate: FlagFilter.tools.parseISODate($(this)
                                     .nextAll(".relativetime:first")
                                     .attr('title'), new Date(0))
                               };
