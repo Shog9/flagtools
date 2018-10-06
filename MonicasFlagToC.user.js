@@ -8,7 +8,7 @@
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
 // @include       http*://askubuntu.com/questions/*
-// @include       http*://askubuntu.com/questions/*
+// @include       http*://*.askubuntu.com/questions/*
 // @include       http*://superuser.com/questions/*
 // @include       http*://*.superuser.com/questions/*
 // @include       http*://serverfault.com/questions/*
