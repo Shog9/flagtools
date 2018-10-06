@@ -3,14 +3,18 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.903
+// @version       0.904
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
 // @include       http*://askubuntu.com/questions/*
+// @include       http*://askubuntu.com/questions/*
 // @include       http*://superuser.com/questions/*
+// @include       http*://*.superuser.com/questions/*
 // @include       http*://serverfault.com/questions/*
+// @include       http*://*.serverfault.com/questions/*
 // @include       http*://mathoverflow.net/questions/*
+// @include       http*://*.mathoverflow.net/questions/*
 // @include       http*://*.stackexchange.com/questions/*
 // @include       http*://local.mse.com/questions/*
 // @exclude       http*://chat.*.com/*
