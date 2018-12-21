@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.904
+// @version       0.905
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -774,9 +774,9 @@ function initQuestionPage()
       {
          var postContainer = $(this),
             postId = postContainer.data('questionid') || postContainer.data('answerid'),
-            issues = postContainer.find(".js-post-issues"),
-            flagsLink = issues.find("a[href='/admin/posts/" + postId + "/show-flags']"),
-            commentsLink = issues.find("a[href='/admin/posts/" + postId + "/comments']"),
+            issues = postContainer.find(".js-post-issue"),
+            flagsLink = issues.filter("a[href='/admin/posts/" + postId + "/show-flags']"),
+            commentsLink = issues.filter("a[href='/admin/posts/" + postId + "/comments']"),
             flags = flagCache[postId],
             totalFlags = flagsLink.length ? +flagsLink.text().match(/\d+/)[0] : 0;
 
@@ -891,9 +891,9 @@ function initQuestionPage()
       
       if (postFlags.commentFlags.length && forceCommentVisibility)
       {
-         let issues = postContainer.find(".js-post-issues"),
+         let issues = postContainer.find(".js-post-issue"),
             moreCommentsLink = $("#comments-link-" + postFlags.postId + " a.js-show-link:last:visible"),
-            deletedCommentsLink = issues.find("a[href='/admin/posts/" + postFlags.postId + "/comments']"),
+            deletedCommentsLink = issues.filter("a[href='/admin/posts/" + postId + "/comments']"),
             inactiveCommentFlags = !postFlags.commentFlags.every(f => f.active);
 
          // load comments to trigger flag display
