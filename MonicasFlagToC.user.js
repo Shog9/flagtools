@@ -893,7 +893,7 @@ function initQuestionPage()
       {
          let issues = postContainer.find(".js-post-issue"),
             moreCommentsLink = $("#comments-link-" + postFlags.postId + " a.js-show-link:last:visible"),
-            deletedCommentsLink = issues.filter("a[href='/admin/posts/" + postId + "/comments']"),
+            deletedCommentsLink = issues.filter("a[href='/admin/posts/" + postFlags.postId + "/comments']"),
             inactiveCommentFlags = !postFlags.commentFlags.every(f => f.active);
 
          // load comments to trigger flag display
