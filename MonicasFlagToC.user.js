@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.906
+// @version       0.907
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -53,7 +53,7 @@ function initStyles()
 
    var flagStyles = document.createElement("style");
    flagStyles.textContent = `
-   #postflag-bar 
+   #postflag-bar
    { 
       display: none; 
       background-color: rgba( 239,240,241, 0.75);
@@ -66,7 +66,8 @@ function initStyles()
       display: grid;
    }
    
-   #postflag-bar .flag-summary
+   
+   #postflag-bar .flag-summary, .js-post-flag-bar .flag-summary
    {
       display: flex;
       flex: 1 auto;
@@ -649,6 +650,11 @@ function initQuestionPage()
 {   
    var flagCache = {};
    var waffleFlags = GetFlagInfoFromWaffleBar();
+   if ( !waffleFlags.length )
+      waffleFlags = GetFlagInfoFromNewFlagBar();
+   
+   for (let fp of waffleFlags)
+      flagCache[fp.postId] = fp;
 
    // give up on the waffle bar if it's listing all flags as handled for a given post - load full flag info.
    waffleFlags.filter(pf => pf.dirty).forEach( pf => RefreshFlagsForPost(pf.postId) );
@@ -1090,8 +1096,8 @@ function initQuestionPage()
       if ( !Object.keys(flagCache).length )
          flagToC = $("<div style='padding:4px; background:white;' class='mx24'>All active flags on this page are currently in review; check back later to see if they were handled.</div>");
 
-      $('#postflag-bar .flag-wrapper, #postflag-bar .flagToC').remove();
-      $("<div class='flag-summary grid fl1 fd-column'>").insertAfter($('#postflag-bar .nav-button.prev, #postflag-bar .nav-button.close').first()).append(flagToC);
+      $('#postflag-bar .flag-wrapper, #postflag-bar .flagToC, .js-post-flag-bar>div>div').remove();
+      $("<div class='flag-summary grid fl1 fd-column'>").insertBefore($('#postflag-bar .nav-button.prev, #postflag-bar .nav-button.close, .js-post-flag-bar>div>button').first()).append(flagToC);
       $('#postflag-bar').show();
 
       function SummarizeFlags(flaggedPost, maxEntries)
@@ -1233,7 +1239,6 @@ function initQuestionPage()
    // and is incorrect in regard to some other information (showing active flags as inactive in cases where a flag has been handled)
    function GetFlagInfoFromWaffleBar()
    {
-      flagCache = flagCache||{};
       return $(".flagged-post-row")
          .map(function()
          {
@@ -1303,12 +1308,97 @@ function initQuestionPage()
             };
             if ( !ret.flags.some( f => f.active ) && !ret.commentFlags.some(f => f.active) )
                ret.dirty = true;
-            flagCache[ret.postId] = ret;
             return ret;
          })
          .toArray();         
    }
 
+   function GetFlagInfoFromNewFlagBar()
+   {
+      return $(".js-flagged-post")
+         .map(function()
+         {
+            var fp = $(this);
+            var ret = {
+               postId: fp.data("post-id"),
+
+               flags: fp.find(".js-post-flag-group")
+                  .map(function()
+                  {
+                     var flag = $(this);
+                     var ids = flag.data("flag-ids");
+                     ids = ids.split ? ids.split(';')
+                        .map(id => +id) : [ids];
+                     var mess = flag.find(">div:first>div>div.fl1");
+                     
+                     var foundUser = false;
+                     var tmp = $("<div>");
+                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || !!this.title; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
+                     return {
+                        flagIds: ids,
+                        description: description,
+                        active: flag.find(".js-dismiss-flags")
+                           .length > 0,
+                        flaggers: mess.find(">span>a[href^='/users/']")
+                           .map(function()
+                           {
+                              var userId = this.href.match(/\/users\/([-\d]+)/);
+                              return {
+                                 userId: userId && userId.length > 0 ? +userId[1] : null,
+                                 name: this.textContent,
+                                 flagCreationDate: FlagFilter.tools.parseISODate($(this)
+                                    .parent()
+                                    .nextAll(".relativetime:first, span[title]").first()
+                                    .attr('title'), new Date(0))
+                              };
+                           })
+                           .toArray()
+                     };
+                  })
+                  .toArray(),
+
+
+               commentFlags: fp.find(".js-flagged-comment")
+                  .map(function()
+                  {
+                     var mess = $(">div>div:nth(1)>div:nth(1)>div:first>div:first>div.fl1", this);
+                     var foundUser = false;
+                     var tmp = $("<div>");
+                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || !!this.title; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
+                     
+                     var commentId = $(".js-comment-link", this).attr("href").match(/#comment(\d+)_\d+/);
+                     var flaggers = mess.find(">span>a[href^='/users/']")
+                           .map(function()
+                           {
+                              var userId = this.href.match(/\/users\/([-\d]+)/);
+                              return {
+                                 userId: userId && userId.length > 0 ? +userId[1] : null,
+                                 name: this.textContent,
+                                 flagCreationDate: FlagFilter.tools.parseISODate($(this)
+                                    .parent()
+                                    .nextAll(".relativetime:first, span[title]").first()
+                                    .attr('title'), new Date(0))
+                              };
+                           })
+                           .toArray();
+                           
+                     if (!commentId || commentId.length < 2) return;
+                     return {
+                        commentId: +commentId[1],
+                        active: true,
+                        description: description,
+                        flaggers: flaggers
+                     };
+                  })
+                  .toArray()
+            };
+            if ( !ret.flags.some( f => f.active ) && !ret.commentFlags.some(f => f.active) )
+               ret.dirty = true;
+            return ret;
+         })
+         .toArray();
+   }
+      
 }
    
 });
