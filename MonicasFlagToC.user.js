@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.907
+// @version       0.908
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -232,7 +232,7 @@ function initStyles()
    }
 
    /*
-     Put comment delete link in consistent place, use words not symbols 
+     Put comment delete link in consistent place
    */
    
    .comment, .comment .flags
@@ -240,22 +240,11 @@ function initStyles()
       clear: both;
    }
    
-   .comment .comment-delete.delete-tag
+   .comment .comment-delete
    {
-      background: none;
-      width: auto;
-      height: auto;
-      line-height: 20px;
-      margin: 0;
-      padding: 0;
       float: right;      
    }
    
-   .comment .comment-delete.delete-tag::after
-   {
-      content: "delete";
-   }
-
    @supports (display: grid) and (not (display: contents) )
    {
       ul.comments-list .active-flag .comment-actions 
