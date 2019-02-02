@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.908
+// @version       0.909
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -34,10 +34,9 @@ function with_jquery(f)
 {
   var script = document.createElement("script");
   script.type = "text/javascript";
-  script.textContent = "if (window.jQuery) (" + f.toString() + ")(window.jQuery)" + "\n\n//# sourceURL=" + encodeURI(GM_info.script.namespace.replace(/\/?$/, "/")) + encodeURIComponent(GM_info.script.name); // make this easier to debug;
+  script.textContent = "if (window.jQuery) (" + f.toString() + ")(window.jQuery)" + "\n\n//# sourceURL=" + encodeURI(GM_info.script.namespace.replace(/\/?$/, "/")) + encodeURIComponent(GM_info.script.name).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16)); // make this easier to debug;
   document.body.appendChild(script);
 }
-
 
 with_jquery(function()
 {
@@ -646,7 +645,8 @@ function initQuestionPage()
       flagCache[fp.postId] = fp;
 
    // give up on the waffle bar if it's listing all flags as handled for a given post - load full flag info.
-   waffleFlags.filter(pf => pf.dirty).forEach( pf => RefreshFlagsForPost(pf.postId) );
+   // also do this if any flag might've put the post into review, so we can indicate that too
+   waffleFlags.filter(pf => pf.dirty || pf.flags.some(f => IsReviewFlag(f))).forEach( pf => RefreshFlagsForPost(pf.postId) );
    RenderToCInWaffleBar();
       
    StackExchange.initialized.then(initFlags);
@@ -783,6 +783,8 @@ function initQuestionPage()
     </ul>
     <div class="mod-actions">
     </div>
+    <ul class="reviews">
+    </ul>
 </div>`)
             .insertBefore(postContainer.find("div:has(>.comments)"));
 
@@ -845,7 +847,7 @@ function initQuestionPage()
             })
          
 
-         let flagItem = RenderFlagItem(flag);
+         let flagItem = RenderFlagItem(flag, postFlags.reviews);
          flagContainer.append(flagItem);
       }
       
@@ -899,10 +901,34 @@ function initQuestionPage()
          else
             ShowCommentFlags(postFlags.postId);
       }
-      else if (totalFlags > activeCount-inactiveCount || tools.find(".mod-tools-comment").length)
+      else if (totalFlags > activeCount-inactiveCount || $("#comments-" + postFlags.postId + " .mod-tools-comment").length)
       {
          ShowCommentFlags(postFlags.postId);
       }
+      
+/* diagnostics
+      
+      if ( postFlags.reviews )
+      {
+         let reviews = '';
+         for (let task of postFlags.reviews.sort((a,b) => b.creationDate-a.CreationDate) )
+         {
+            reviews += `
+            <li>
+                  <span title="${FlagFilter.tools.formatISODate(task.creationDate)}" class="relativetime-clean">${FlagFilter.tools.formatDate(task.creationDate)}</span>
+                  <a href="${task.url}">${task.type}</a>
+            `;
+            if ( task.result )
+               reviews += `<span>ended 
+                  <span title="${FlagFilter.tools.formatISODate(task.resultDate)}" class="relativetime-clean">${FlagFilter.tools.formatDate(task.resultDate)}</span>: 
+               ${task.result}</span>`;
+            else
+               reviews += "<i>pending...</i>";
+            reviews += "</li>";
+         }
+         tools.find("ul.reviews").empty().append(reviews);
+      }
+*/
       
       StackExchange.realtime.updateRelativeDates();
    }
@@ -993,7 +1019,7 @@ function initQuestionPage()
          .html(flagSummary.join("; "));
    }
 
-   function RenderFlagItem(flag)
+   function RenderFlagItem(flag, reviews)
    {
       let flagItem = $(`<li>
              <span class="flag-text revision-comment ${flag.active ? 'active-flag' : 'blur'}">${flag.description}</span>
@@ -1011,6 +1037,17 @@ function initQuestionPage()
             .append(flag.resultUser ? `<span> &ndash; </span><a href="/users/${flag.resultUser.userId}" class="flag-creation-user comment-user">${flag.resultUser.name}</a>` : '<span> &ndash; </span>')
             .append(`<span class="flag-creation-date comment-date" dir="ltr"> <span title="${FlagFilter.tools.formatISODate(flag.resultDate)}" class="relativetime-clean">${FlagFilter.tools.formatDate(flag.resultDate)}</span></span>`)
             .appendTo(flagItem);
+      }
+      else if ( reviews && IsReviewFlag(flag) )
+      {
+         var flagCreationDate = flag.flaggers && flag.flaggers.length ? new Date(flag.flaggers.reduce( (min, cur) => Math.min(min, cur.flagCreationDate), Infinity)) : 0;
+         for (let task of reviews.sort((a,b) => b.creationDate-a.CreationDate).filter(t => t.type === "low quality" && t.creationDate > flagCreationDate ) )
+         {
+            if ( task.result )
+               $(`<div class='flag-outcome blur'><a href="${task.url}">reviewed</a>: <i>${task.result}</i> <span title="${FlagFilter.tools.formatISODate(task.resultDate)}" class="relativetime-clean">${FlagFilter.tools.formatDate(task.resultDate)}</span></div>`).appendTo(flagItem);
+            else
+               $(`<div class='flag-outcome'><a href="${task.url}">in review</a> since <span title="${FlagFilter.tools.formatISODate(task.creationDate)}" class="relativetime-clean">${FlagFilter.tools.formatDate(task.creationDate)}</span></div>`).appendTo(flagItem);
+         }
       }
 
       if (!flag.active)
@@ -1042,6 +1079,11 @@ function initQuestionPage()
          flagItem.find(".flaggers").append(flaggerNames.join(", "));
       }
       return flagItem;
+   }
+   
+   function IsReviewFlag(flag)
+   {
+      return flag.active && (flag.description == "not an answer" || flag.description == "very low quality" || /Low answer quality score/.test(flag.description));
    }
    
    function RenderToCInWaffleBar()
@@ -1127,11 +1169,13 @@ function initQuestionPage()
          var ret = {
             postId: postId,
             flags: [],
-            commentFlags: []
+            commentFlags: [],
+            reviews: []
          };
          
-         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]"));
+         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]:not(.deleted-event-details)"));
          var flaggedCommentList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=comment] td.event-comment .toggle-comment-flags-container a[data-flag-ids]"));
+         var reviewList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=review]:not(.deleted-event-details)"));
          var commentMap = flaggedCommentList.reduce( function(acc, fc)
             {
                var flagIds = fc.dataset.flagIds.split(';');
@@ -1191,6 +1235,26 @@ function initQuestionPage()
                ret.flags.push(flag);
             }
          }
+         
+         ret.reviews = reviewList.map(function(row)
+         {
+            var id = +row.dataset.eventid;
+            var deleteRow = deletionList.find( el => el.dataset.eventid==id );
+            var created = row.querySelector(":scope>td.creation-date span.relativetime");
+            var reviewType = row.querySelector(":scope>td.event-verb>span>a");
+            var completed = deleteRow && deleteRow.querySelector(":scope>td.creation-date span.relativetime");
+            var resultType = deleteRow && deleteRow.querySelector(":scope>td.event-verb>span");
+            var result = deleteRow && deleteRow.querySelector(":scope>td.event-comment>span");
+            
+            return { 
+               id: id, 
+               creationDate: FlagFilter.tools.parseISODate(created.title),
+               type: (reviewType && reviewType.textContent.trim()) || "",
+               url: reviewType && reviewType.href,
+               resultDate: completed ? FlagFilter.tools.parseISODate(completed.title) : null,
+               result: (result && result.textContent.trim()) || (resultType && resultType.textContent.trim())
+            };
+         });
          
          // consolidate flags with similar description and disposition
          
