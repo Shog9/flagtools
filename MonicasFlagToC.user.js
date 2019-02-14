@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.909
+// @version       0.910
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -1093,7 +1093,7 @@ function initQuestionPage()
       {
          let post = $(".answer[data-answerid='"+postId+"'],.question[data-questionid='"+postId+"']"),
             postType = post.is(".answer") ? "answer" : "question",
-            userLink = post.find(".user-details a[href^='/users/']:last,.user-details #history-"+postId),
+            userLink = post.find(".user-details[itemprop='author'] a[href^='/users/']:first,.user-details #history-"+postId),
             attribution = (userLink.is('#history-'+postId) ? '(wiki)' : "by " + userLink.text()),
             url = postType == 'question' ? '#question' : "#" + postId; 
          if ( !post.length ) // handle flags spanning multiple pages of answers
