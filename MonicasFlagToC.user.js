@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.911
+// @version       0.912
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -1382,7 +1382,7 @@ function initQuestionPage()
                      var ids = flag.data("flag-ids");
                      ids = ids.split ? ids.split(';')
                         .map(id => +id) : [ids];
-                     var mess = flag.find(">div:first>div>div.fl1");
+                     var mess = flag.find(">div:first .js-flag-text");
                      
                      var foundUser = false;
                      var tmp = $("<div>");
@@ -1414,7 +1414,7 @@ function initQuestionPage()
                commentFlags: fp.find(".js-flagged-comment")
                   .map(function()
                   {
-                     var mess = $(">div>div:nth(1)>div:nth(1)>div:first>div:first>div.fl1", this);
+                     var mess = $(".js-flag-text", this);
                      var foundUser = false;
                      var tmp = $("<div>");
                      var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || !!this.title; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
