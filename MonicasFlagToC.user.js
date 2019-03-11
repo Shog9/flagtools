@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.912
+// @version       0.913
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -1386,7 +1386,7 @@ function initQuestionPage()
                      
                      var foundUser = false;
                      var tmp = $("<div>");
-                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || !!this.title; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
+                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || $(this).has("a[href^='/users/']").length; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
                      return {
                         flagIds: ids,
                         description: description,
@@ -1417,7 +1417,7 @@ function initQuestionPage()
                      var mess = $(".js-flag-text", this);
                      var foundUser = false;
                      var tmp = $("<div>");
-                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || !!this.title; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
+                     var description = tmp.append( mess.contents().filter( function() { foundUser = foundUser || $(this).has("a[href^='/users/']").length; return !foundUser; }).clone() ).html().replace(/\s+-\s+$/, '');
                      
                      var commentId = $(".js-comment-link", this).attr("href").match(/#comment(\d+)_\d+/);
                      var flaggers = mess.find(">span>a[href^='/users/']")
