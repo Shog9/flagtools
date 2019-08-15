@@ -3,7 +3,7 @@
 // @description   Alternate flag dashboard UI scratchpad
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       5
+// @version       5.1
 // @include       http*://stackoverflow.com/*
 // @include       http*://*.stackoverflow.com/*
 // @include       http*://dev.stackoverflow.com/*
@@ -484,7 +484,7 @@ function initTools()
 
       dismissFlag: function(postId, flagIds, helpful, declineId, comment)
       {
-         var ticks = window.renderTimeTicks||(Date.now()*10000+621355968000000000);
+         var ticks = StackExchange.moderator.renderTimeTicks||(Date.now()*10000+621355968000000000);
          return $.post('/messages/delete-moderator-messages/' + postId + '/'
             + ticks + '?valid=' + helpful + '&flagIdsSemiColonDelimited=' + (flagIds.join ? flagIds.join(';') : flagIds),
             {comment: comment||declineId||'', fkey:StackExchange.options.user.fkey});
@@ -492,7 +492,7 @@ function initTools()
 
       dismissAllFlags: function(postId, helpful, declineId, comment)
       {
-         var ticks = window.renderTimeTicks||(Date.now()*10000+621355968000000000);
+         var ticks = StackExchange.moderator.renderTimeTicks||(Date.now()*10000+621355968000000000);
          return $.post('/messages/delete-moderator-messages/' + postId + '/'
             + ticks+ '?valid=' + helpful,
             {comment: comment||declineId||'', fkey:StackExchange.options.user.fkey});
