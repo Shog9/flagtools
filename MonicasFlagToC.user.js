@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.913
+// @version       0.914
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -377,7 +377,7 @@ function initTools()
 
       dismissFlag: function(postId, flagIds, helpful, declineId, comment)
       {
-         var ticks = window.renderTimeTicks||(Date.now()*10000+621355968000000000);
+         var ticks = StackExchange.moderator.renderTimeTicks||(Date.now()*10000+621355968000000000);
          return $.post('/messages/delete-moderator-messages/' + postId + '/'
             + ticks + '?valid=' + helpful + '&flagIdsSemiColonDelimited=' + (flagIds.join ? flagIds.join(';') : flagIds),
             {comment: comment||declineId||'', fkey:StackExchange.options.user.fkey});
@@ -385,7 +385,7 @@ function initTools()
 
       dismissAllFlags: function(postId, helpful, declineId, comment)
       {
-         var ticks = window.renderTimeTicks||(Date.now()*10000+621355968000000000);
+         var ticks = StackExchange.moderator.renderTimeTicks||(Date.now()*10000+621355968000000000);
          return $.post('/messages/delete-moderator-messages/' + postId + '/'
             + ticks+ '?valid=' + helpful,
             {comment: comment||declineId||'', fkey:StackExchange.options.user.fkey});
