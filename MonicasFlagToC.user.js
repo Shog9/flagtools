@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.914
+// @version       0.915
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -646,10 +646,11 @@ function initQuestionPage()
 
    // give up on the waffle bar if it's listing all flags as handled for a given post - load full flag info.
    // also do this if any flag might've put the post into review, so we can indicate that too
-   waffleFlags.filter(pf => pf.dirty || pf.flags.some(f => IsReviewFlag(f))).forEach( pf => RefreshFlagsForPost(pf.postId) );
+   var loadingFlags = waffleFlags.filter(pf => pf.dirty || pf.flags.some(f => IsReviewFlag(f))).map( pf => RefreshFlagsForPost(pf.postId) );
    RenderToCInWaffleBar();
       
-   StackExchange.initialized.then(initFlags);
+   StackExchange.initialized
+      .then(initFlags);
 
    //  Wire up prototype mod tools
    $("#content")
@@ -930,7 +931,7 @@ function initQuestionPage()
       }
 */
       
-      StackExchange.realtime.updateRelativeDates();
+      setTimeout(() => StackExchange.realtime.updateRelativeDates(), 100);
    }
 
    function ShowCommentFlags(postId)
