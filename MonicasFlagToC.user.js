@@ -1174,9 +1174,9 @@ function initQuestionPage()
             reviews: []
          };
          
-         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]:not(.deleted-event-details)"));
+         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]:not(.deleted-event)"));
          var flaggedCommentList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=comment] td.event-comment .toggle-comment-flags-container a[data-flag-ids]"));
-         var reviewList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=review]:not(.deleted-event-details)"));
+         var reviewList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=review]:not(.deleted-event)"));
          var commentMap = flaggedCommentList.reduce( function(acc, fc)
             {
                var flagIds = fc.dataset.flagIds.split(';');
@@ -1187,7 +1187,7 @@ function initQuestionPage()
                }
                return acc;
             }, {});
-         var deletionList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr.deleted-event-details[data-eventid]"));
+         var deletionList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr.deleted-event[data-eventid]"));
          for (let row of flagList)
          {
             var id = +row.dataset.eventid;
@@ -1242,9 +1242,9 @@ function initQuestionPage()
             var id = +row.dataset.eventid;
             var deleteRow = deletionList.find( el => el.dataset.eventid==id );
             var created = row.querySelector(":scope>td.creation-date span.relativetime");
-            var reviewType = row.querySelector(":scope>td.event-verb>span>a");
+            var reviewType = row.querySelector(":scope>td:nth-of-type(3)>span>a");
             var completed = deleteRow && deleteRow.querySelector(":scope>td.creation-date span.relativetime");
-            var resultType = deleteRow && deleteRow.querySelector(":scope>td.event-verb>span");
+            var resultType = deleteRow && deleteRow.querySelector(":scope>td:nth-of-type(3)>span");
             var result = deleteRow && deleteRow.querySelector(":scope>td.event-comment>span");
             
             return { 
