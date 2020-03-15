@@ -1194,7 +1194,7 @@ function initQuestionPage()
             var deleteRow = deletionList.find( el => el.dataset.eventid==id );
             var created = row.querySelector(":scope>td.creation-date span.relativetime");
             var eventType = row.querySelector(":scope>td.event-type>span.event-type");
-            var flagType = row.querySelector(":scope>td.event-verb>span");
+            var flagType = row.querySelector(":scope>td:nth-of-type(3)>span");
             var flagger = row.querySelector(":scope>td>span.created-by>a");
             var description = row.querySelector(":scope>td.event-comment>span");
             var deleted = deleteRow && deleteRow.querySelector(":scope>td.creation-date span.relativetime");
