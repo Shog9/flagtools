@@ -3,7 +3,7 @@
 // @description   Implement https://meta.stackexchange.com/questions/305984/suggestions-for-improving-the-moderator-flag-overlay-view/305987#305987
 // @author        Shog9
 // @namespace     https://github.com/Shog9/flagfilter/
-// @version       0.915
+// @version       0.92
 // @include       http*://stackoverflow.com/questions/*
 // @include       http*://*.stackoverflow.com/questions/*
 // @include       http*://dev.stackoverflow.com/questions/*
@@ -1174,9 +1174,9 @@ function initQuestionPage()
             reviews: []
          };
          
-         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]:not(.deleted-event-details)"));
-         var flaggedCommentList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=comment] td.event-comment .toggle-comment-flags-container a[data-flag-ids]"));
-         var reviewList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=review]:not(.deleted-event-details)"));
+         var flagList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=flag]"));
+         var flaggedCommentList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=comment] td.event-comment .js-toggle-comment-flags[data-flag-ids]"));
+         var reviewList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr[data-eventtype=review]"));
          var commentMap = flaggedCommentList.reduce( function(acc, fc)
             {
                var flagIds = fc.dataset.flagIds.split(';');
@@ -1187,18 +1187,18 @@ function initQuestionPage()
                }
                return acc;
             }, {});
-         var deletionList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr.deleted-event-details[data-eventid]"));
+         var deletionList = Array.from(dom.querySelectorAll(".post-timeline .event-rows tr.deleted-event[data-eventid]+tr"));
          for (let row of flagList)
          {
             var id = +row.dataset.eventid;
             var deleteRow = deletionList.find( el => el.dataset.eventid==id );
             var created = row.querySelector(":scope>td.creation-date span.relativetime");
             var eventType = row.querySelector(":scope>td.event-type>span.event-type");
-            var flagType = row.querySelector(":scope>td.event-verb>span");
-            var flagger = row.querySelector(":scope>td>span.created-by>a");
+            var flagType = row.querySelector(":scope>td.event-type+td>span");
+            var flagger = row.querySelector(":scope>td>span.js-created-by>a");
             var description = row.querySelector(":scope>td.event-comment>span");
             var deleted = deleteRow && deleteRow.querySelector(":scope>td.creation-date span.relativetime");
-            var mod = deleteRow && deleteRow.querySelector(":scope>td>span.created-by>a");
+            var mod = deleteRow && deleteRow.querySelector(":scope>td>span.js-created-by>a");
             var result = deleteRow && deleteRow.querySelector(":scope>td.event-comment>span");
             
             if ( !created || !eventType || !flagType ) continue;
@@ -1242,9 +1242,9 @@ function initQuestionPage()
             var id = +row.dataset.eventid;
             var deleteRow = deletionList.find( el => el.dataset.eventid==id );
             var created = row.querySelector(":scope>td.creation-date span.relativetime");
-            var reviewType = row.querySelector(":scope>td.event-verb>span>a");
+            var reviewType = row.querySelector(":scope>td.event-type+td>span>a");
             var completed = deleteRow && deleteRow.querySelector(":scope>td.creation-date span.relativetime");
-            var resultType = deleteRow && deleteRow.querySelector(":scope>td.event-verb>span");
+            var resultType = deleteRow && deleteRow.querySelector(":scope>td.event-type+td>span");
             var result = deleteRow && deleteRow.querySelector(":scope>td.event-comment>span");
             
             return { 
